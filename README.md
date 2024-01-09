@@ -70,3 +70,13 @@
    ]
   }
   ```
+
+
+## 프로젝트 의존성 목록
+- Web
+- JPA
+- HATEOAS
+- REST Docs
+- H2
+- PostgreSQL
+- Lombok
