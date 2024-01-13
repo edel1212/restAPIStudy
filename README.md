@@ -80,3 +80,6 @@
 - H2
 - PostgreSQL
 - Lombok
+
+
+### HATEAOS?
