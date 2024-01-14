@@ -82,4 +82,33 @@
 - Lombok
 
 
-### HATEAOS?
+### Dependencies 스코프 관련
+- Test Scope로 설정 시 프로젝트가 실행 시 해당 디팬던시는 사용되지 않는다.
+   - 따라서 테스트에만 사용할 의존성의 경우 스코프를 변경하여 개발하는 습관을 들이자.
+- ex) h2 Database의 경우 테스트로만 사용 예정
+  - Maven
+    ```xml
+    <deepndency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <!--    <scope>runtime</scope> -->
+      <!-- 변경 -->
+      <scope>test</scope>
+    </deepndency>
+    ```
+  - Gradle
+    ```groovy
+    dependencies {
+       //runtimeOnly 'com.h2database:h2'
+       /** 변경  */
+       testImplementation 'com.h2database:h2'
+    }
+    ```
+| 스코프          | Maven 설정                           | Gradle 설정                               | 설명                                       |
+|-----------------|--------------------------------------|--------------------------------------------|--------------------------------------------|
+| 컴파일          | `<scope>compile</scope>`              | `implementation 'group:artifact:version'`  | 모든 빌드 단계에서 사용되는 기본적인 의존성 범위   |
+| 컴파일 전용     | `<scope>provided</scope>`             | `compileOnly 'group:artifact:version'`     | 컴파일 시에만 사용되며, 런타임에서는 제외됨       |
+| 런타임 전용     | `<scope>runtime</scope>`              | `runtimeOnly 'group:artifact:version'`     | 런타임 시에만 사용되며, 컴파일 시에는 사용되지 않음 |
+| 시스템          | `<scope>system</scope>`               | 사용하지 않음 (사용 시에는 추가 설정 필요) | 시스템에 직접 설치된 JAR 파일과 같은 외부 JAR 파일에 대한 의존성 |
+| 테스트          | `<scope>test</scope>`                 | `testImplementation 'group:artifact:version'`| 테스트 코드에서만 사용되는 의존성               |
+| 어노테이션 프로세서 | `<scope>compile</scope>` + 어노테이션 프로세서 플러그인 | `annotationProcessor 'group:artifact:version'` | 컴파일 시에만 사용되는 어노테이션 프로세서     |
