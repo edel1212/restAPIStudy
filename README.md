@@ -112,3 +112,18 @@
 | 시스템          | `<scope>system</scope>`               | 사용하지 않음 (사용 시에는 추가 설정 필요) | 시스템에 직접 설치된 JAR 파일과 같은 외부 JAR 파일에 대한 의존성 |
 | 테스트          | `<scope>test</scope>`                 | `testImplementation 'group:artifact:version'`| 테스트 코드에서만 사용되는 의존성               |
 | 어노테이션 프로세서 | `<scope>compile</scope>` + 어노테이션 프로세서 플러그인 | `annotationProcessor 'group:artifact:version'` | 컴파일 시에만 사용되는 어노테이션 프로세서     |
+
+
+
+## 테스트 코드 작성
+- 
+
+
+<hr/>
+
+## 유용한 intellij 단축키
+- `커맨드 + 쉬프트 + t` :  사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
+- `컨트롤 + 옵션 + o` : 사용하지 않는 import 자동 삭제
+- `알트 + 엔터`  : 자동 import 
+- `알트 + 커맨드 + v` : 중복 값을 추출하여 변수로 만들어 줌
+- `커맨드 + 쉬프트 + v` : 과거 복사 이력 사용 가능 윈도우 클립 보드 기능 유사
