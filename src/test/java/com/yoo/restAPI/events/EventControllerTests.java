@@ -1,6 +1,7 @@
 package com.yoo.restAPI.events;
 
-import org.junit.Test;
+//import org.junit.Test; ❌ Junit4버전
+import org.junit.jupiter.api.Test; // 👍 Junit5버전
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,11 +29,11 @@ public class EventControllerTests {
     @Test
     public void createEvent() throws Exception {
         mockMvc.perform(
-                        post("/api/events/")
+                        post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaTypes.HAL_JSON) // HATOAS를 Import 해줘야 함
                 )
-                //.andDo(print())
+                .andDo(print())
                 .andExpect(status().isCreated());
     }
 }

@@ -227,10 +227,14 @@ dependencies {
 - 주의
   - `MediaTypes.HAL_JSON`을 사용할때 **"s"**를 잊지말자!!
     - `import org.springframework.hateoas.MediaTypes;`를 사용해 Import 해야 함!!
+  - Junit 버전에 맞게 import 해줘야함 안그러면 에러 발생
+    - `//import org.junit.Test; ❌ Junit4버전`
+    - `import org.junit.jupiter.api.Test; // 👍 Junit5버전`
 - 테스트 코드
 
   ```java
-  import org.junit.runner.RunWith;
+  //import org.junit.Test; ❌ Junit4버전
+  import org.junit.jupiter.api.Test; // 👍 Junit5버전
   import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
   import org.springframework.hateoas.MediaTypes;
   import org.springframework.http.MediaType;
@@ -255,10 +259,11 @@ dependencies {
       @Test
       public void createEvent() throws Exception {
           mockMvc.perform(
-                          post("/api/events/")
+                          post("/api/events")
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .accept(MediaTypes.HAL_JSON) // HATOAS를 Import 해줘야 함
                   )
+                  .andDo(print())
                   .andExpect(status().isCreated());
       }
   }
