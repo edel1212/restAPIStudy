@@ -270,6 +270,83 @@ dependencies {
 
   ```
 
+### 테스트 - Contorller // Body 추가
+
+- Spring Boot는 `Jackson`이 자동으로 의존성 주입이 되어있기에 `@Autowired`를 통해 쉽게 사용이 가능하다.
+- MockMvc객체에서 Body는 `content()`에 넣는다
+- 테스트 코드
+
+  ```java
+  @RunWith(SpringRunner.class)
+  @WebMvcTest
+  public class EventControllerTests {
+
+      @Autowired
+      private MockMvc mockMvc;
+
+      // 👉 Spring Boot는 자동으로 Jackson이 의존성주입이 되어이 있음
+      @Autowired
+      private ObjectMapper objectMapper;
+
+      @Test
+      public void createEvent() throws Exception {
+
+          Event event = Event.builder()
+                  .name("Spring")
+                  .description("Rest API Test")
+                  .beginEventDateTime(LocalDateTime.now().minusDays(2))
+                  .closeEnrollmentDateTime(LocalDateTime.now())
+                  .endEventDateTime(LocalDateTime.now())
+                  .basePrice(100)
+                  .maxPrice(200)
+                  .limitOfEnrollment(100)
+                  .location("공릉역")
+                  .build();
+
+          mockMvc.perform(
+                          post("/api/events")
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .accept(MediaTypes.HAL_JSON)
+                          // 💬 Body 값 등록
+                          .content(objectMapper.writeValueAsString(event))
+                  )
+                  .andDo(print())
+                  .andExpect(status().isCreated())      // 성공일 경우 201 반환
+                  .andExpect(jsonPath("id").exists());  // 응답 값에 id가 있는지 확인
+      }
+  }
+  ```
+
+- Header에 HATEOS 링크를 만들 떄 `linkTo()`를 사용할 떄 Import를 주의하자 - **삽질 1시간넘게 함**
+  - `//import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;` ❌ 이거 아님 ...
+  - `import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;` 👍 이거로 해야함 ...
+- `@RequestMapping`에 consumes , produces 설정을 하면 하위 메서드에 전역적으로 설정된다.
+- `linkTo()`, `methodOn()`, `slash()`를 사용하면 링크를 만들 수 있다
+- 컨트롤러 코드
+
+  ```java
+  // ⭐ WebMvcLinkBuilder를 import 해줘야한다 .. 삽질함..
+  import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+  //import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo; ❌ 이거 아님 ...
+
+  @Controller
+  // ⭐ RequestMapping을 사용해서 produces를 지정하면 하위 모든 Method의 반환 타입을 지정 가능하다!
+  @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE )
+  public class EventController {
+
+      @PostMapping
+      public ResponseEntity createEvent(@RequestBody Event event){
+          /** Method에 path정보가 있을 경우 "methodOn()" 와 "해당함수명()" 를 사용해 추출해야 했음  */
+          // URI createdUri = linkTo(methodOn(EventController.class).createEvent(event)).slash("{id}").toUri();
+
+          URI createdUri = linkTo(EventController.class).slash("{id}").toUri();
+          event.setId(999);
+          return ResponseEntity.created(createdUri).body(event);
+      }
+
+  }
+  ```
+
 <hr/>
 
 ## 유용한 intellij 단축키

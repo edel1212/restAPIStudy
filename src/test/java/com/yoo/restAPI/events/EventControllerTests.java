@@ -54,10 +54,11 @@ public class EventControllerTests {
                         post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaTypes.HAL_JSON) // HATOAS를 Import 해줘야 함
+                        // 💬 Body 값 등록
                         .content(objectMapper.writeValueAsString(event))
                 )
                 .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").exists());
+                .andExpect(status().isCreated())    // 성공일 경우 201 반환
+                .andExpect(jsonPath("id").exists());    // 응답 값에 id가 있는지 확인
     }
 }
