@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)    //Spring 테스트 컨텍스트를 관리하면서 테스트를 실행하는 데 사용되는 JUnit 러너입니다.
@@ -22,7 +23,7 @@ public class EventControllerTests {
      * - 디스패처서블릿을 만들기 떄문에 단위 테스트보다는 느리다
      * */
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Test
     public void createEvent() throws Exception {
@@ -31,6 +32,7 @@ public class EventControllerTests {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaTypes.HAL_JSON) // HATOAS를 Import 해줘야 함
                 )
+                //.andDo(print())
                 .andExpect(status().isCreated());
     }
 }
