@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,8 +18,7 @@ import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)    //Spring 테스트 컨텍스트를 관리하면서 테스트를 실행하는 데 사용되는 JUnit 러너입니다.
 @WebMvcTest                     // MockMvc 빈을 자동으로 설정해준다 ___ 웹 관련 빈만 등록해 준다(슬라이스)
@@ -43,7 +43,7 @@ public class EventControllerTests {
 
     @Test
     public void createEvent() throws Exception {
-
+        /** Given */
         Event event = Event.builder()
                 .name("Spring")
                 .description("Rest API Test")
@@ -64,7 +64,7 @@ public class EventControllerTests {
         event.setId(999);
         Mockito.when(eventRepository.save(event)).thenReturn(event);
 
-
+        /** When */
         mockMvc.perform(
                         post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -73,7 +73,10 @@ public class EventControllerTests {
                         .content(objectMapper.writeValueAsString(event))
                 )
                 .andDo(print())
-                .andExpect(status().isCreated())    // 성공일 경우 201 반환
-                .andExpect(jsonPath("id").exists());    // 응답 값에 id가 있는지 확인
+                /** Then */
+                .andExpect(status().isCreated())                  // 성공일 경우 201 반환
+                .andExpect(jsonPath("id").exists())     // 응답 값에 id가 있는지 확인
+                .andExpect(header().exists(HttpHeaders.LOCATION))    // 응답 로케이션 유무 확인
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)); // Content-Type 체크
     }
 }
