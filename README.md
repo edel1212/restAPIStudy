@@ -347,6 +347,51 @@ dependencies {
   }
   ```
 
+### 테스트 - 다른 빈 연결
+
+- 이전과 같은 코드에서 테스트 시 해당 Controller가 생성자로 다른 Bean을 주입받고있다면 에러가 발생한다.
+  - 에러 코드
+    - `Parameter 0 of constructor in com.yoo.restAPI.events.EventController required a bean of type 'com.yoo.restAPI.events.EventRepository' that could not be found.`
+  - 해결방법 : `@MockBean`을 활용하면 된다. - 단 해당 방법을 사용해도 해당 요청에 따른 Controller의 응답값은 null이기에 처리다 따로 필요하다.
+    - `null point`에러를 처리하기 위해서는 스터빙이 필요하다
+- 예시 코드
+
+  ```java
+  // Controller
+  @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE )
+  public class EventController {
+      private final EventRepository eventRepository;
+      @PostMapping
+      public ResponseEntity createEvent(@RequestBody Event event){
+          // 저장
+          Event newEvent =  this.eventRepository.save(event);
+          // code ...
+      }
+  }
+
+  // Test Code
+  @RunWith(SpringRunner.class)
+  @WebMvcTest
+  public class EventControllerTests {
+
+      @Autowired
+      private MockMvc mockMvc;
+
+      @Autowired
+      private ObjectMapper objectMapper;
+
+      // ⭐ @MockBean을 통해 가짜 객체 생성
+      @MockBean
+      private EventRepository eventRepository;
+
+      @Test
+      public void createEvent() throws Exception {
+        // 코드 생략 ... 요청 코드
+        mockMvc.perform(post("/api/events"))
+      }
+  }
+  ```
+
 <hr/>
 
 ## 유용한 intellij 단축키

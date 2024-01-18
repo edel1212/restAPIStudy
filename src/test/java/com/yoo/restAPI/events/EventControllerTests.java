@@ -4,8 +4,10 @@ package com.yoo.restAPI.events;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test; // 👍 Junit5버전
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -35,6 +37,10 @@ public class EventControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    // ⭐ @MockBean을 통해 가짜 객체 생성
+    @MockBean
+    private EventRepository eventRepository;
+
     @Test
     public void createEvent() throws Exception {
 
@@ -49,6 +55,15 @@ public class EventControllerTests {
                 .limitOfEnrollment(100)
                 .location("공릉역")
                 .build();
+
+        /**
+         * 👉 스터빙 코드
+         *    - 사용하지 않을 시 저장해도 null을 반환하기에 저장 시 진행 될 코드를 만드는것
+         *    - Id를 지정해주는 것은 시퀀스로 자동 생성으로 할 것이기에 body 값에 없기 떄문임!
+         * */
+        event.setId(999);
+        Mockito.when(eventRepository.save(event)).thenReturn(event);
+
 
         mockMvc.perform(
                         post("/api/events")
