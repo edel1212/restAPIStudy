@@ -1,5 +1,6 @@
 package com.yoo.restAPI.events;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,16 +18,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 //import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo; ❌ 이거 아님 ...
 
 @Controller
+@RequiredArgsConstructor
 // ⭐ RequestMapping을 사용해서 produces를 지정하면 하위 모든 Method의 반환 타입을 지정 가능하다!
 @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE )
 public class EventController {
 
+    private final EventRepository eventRepository;
+
     @PostMapping
     public ResponseEntity createEvent(@RequestBody Event event){
-        /** Method에 path정보가 있을 경우 "methodOn()" 와 "해당함수명()" 를 사용해 추출해야 했음  */
-        // URI createdUri = linkTo(methodOn(EventController.class).createEvent(event)).slash("{id}").toUri();
-
-        URI createdUri = linkTo(EventController.class).slash("{id}").toUri();
+        // 저장
+        Event newEvent =  this.eventRepository.save(event);
+        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
         event.setId(999);
         return ResponseEntity.created(createdUri).body(event);
     }

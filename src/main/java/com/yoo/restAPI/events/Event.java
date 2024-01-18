@@ -1,5 +1,6 @@
 package com.yoo.restAPI.events;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,16 +20,25 @@ import java.time.LocalDateTime;
  *    다른 Entity를 참조하는 필드를 넣지 않느 것이다.
  * */
 @EqualsAndHashCode( of = "id")
+@Entity
 // @Data  <<가 있지만 Entity에서는 사용하지말자 위에서 말한 EqualsAndHashCode를 모든 필드를 대상으로 만들기 떄문이다.
 public class Event {
     // 식별자
+    @Id @GeneratedValue
     private Integer id;
+
+    // 이벤트 상태
+    /**
+     * 👉 @Enumerated을 지정해주자 그래야 String으로 들어감
+     *    미사용시 enum의 순서로 저장되기에 순서가 바뀌면 위험해지기 떄문이다.
+     * */
+    @Enumerated(EnumType.STRING)
+    private EventStatus eventStatus;
+
     // 오프라인 구분
     private boolean offline;
     // 유료, 무료구분
     private boolean free;
-    // 이벤트 상태
-    private EventStatus eventStatus;
 
     private String name;
     private String description;
