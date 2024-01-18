@@ -74,8 +74,8 @@ public class EventControllerTests {
                 )
                 .andDo(print())
                 /** Then */
-                .andExpect(status().isCreated())                  // 성공일 경우 201 반환
-                .andExpect(jsonPath("id").exists())     // 응답 값에 id가 있는지 확인
+                .andExpect(status().isCreated())                     // 성공일 경우 201 반환
+                .andExpect(jsonPath("id").exists())        // 응답 값에 id가 있는지 확인
                 .andExpect(header().exists(HttpHeaders.LOCATION))    // 응답 로케이션 유무 확인
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)); // Content-Type 체크
     }

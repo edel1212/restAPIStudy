@@ -353,7 +353,10 @@ dependencies {
   - 에러 코드
     - `Parameter 0 of constructor in com.yoo.restAPI.events.EventController required a bean of type 'com.yoo.restAPI.events.EventRepository' that could not be found.`
   - 해결방법 : `@MockBean`을 활용하면 된다. - 단 해당 방법을 사용해도 해당 요청에 따른 Controller의 응답값은 null이기에 처리다 따로 필요하다.
-    - `null point`에러를 처리하기 위해서는 스터빙이 필요하다
+    - `null point`에러를 처리하기 위해서는 **스터빙이** 필요하다
+      - `Mockito.when(레포지토리.save(?)).thenReturn(?);`와 같이 Mockito를 사용하면 스터빙이 가능하다
+- 팁
+  - `HttpHeaders` 와 `MediaTypes` or `MediaType`을 활용해서 타입 세이프티하게 구현 및 테스트하자!!
 - 예시 코드
 
   ```java
@@ -386,8 +389,21 @@ dependencies {
 
       @Test
       public void createEvent() throws Exception {
-        // 코드 생략 ... 요청 코드
-        mockMvc.perform(post("/api/events"))
+
+        /**
+         * 👉 스터빙 코드
+         *    - 사용하지 않을 시 저장해도 null을 반환하기에 저장 시 진행 될 코드를 만드는것
+         *    - Id를 지정해주는 것은 시퀀스로 자동 생성으로 할 것이기에 body 값에 없기 떄문임!
+         * */
+        event.setId(999);
+        Mockito.when(eventRepository.save(event)).thenReturn(event);
+
+        mockMvc.perform(/* 생략 */)
+                /** Then */
+                .andExpect(status().isCreated())                  // 성공일 경우 201 반환
+                .andExpect(jsonPath("id").exists())               // 응답 값에 id가 있는지 확인
+                .andExpect(header().exists(HttpHeaders.LOCATION)) // 응답 로케이션 유무 확인
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE)); // Content-Type 체크
       }
   }
   ```
