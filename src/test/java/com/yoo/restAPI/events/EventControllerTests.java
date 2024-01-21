@@ -2,6 +2,7 @@ package com.yoo.restAPI.events;
 
 //import org.junit.Test; ❌ Junit4버전
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test; // 👍 Junit5버전
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -53,6 +54,7 @@ public class EventControllerTests {
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
+                .free(true)
                 .location("공릉역")
                 .build();
 
@@ -77,6 +79,9 @@ public class EventControllerTests {
                 .andExpect(status().isCreated())                     // 성공일 경우 201 반환
                 .andExpect(jsonPath("id").exists())        // 응답 값에 id가 있는지 확인
                 .andExpect(header().exists(HttpHeaders.LOCATION))    // 응답 로케이션 유무 확인
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)); // Content-Type 체크
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)) // Content-Type 체크
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                ;
     }
 }

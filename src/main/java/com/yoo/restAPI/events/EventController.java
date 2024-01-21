@@ -1,6 +1,7 @@
 package com.yoo.restAPI.events;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,8 +26,15 @@ public class EventController {
 
     private final EventRepository eventRepository;
 
+    // Application에서 Bean등록 완료
+    private final ModelMapper modelMapper;
+
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody Event event){
+    public ResponseEntity createEvent(@RequestBody EventDTO eventDTO){
+
+        // 👉 modelMapper를 통해 DTO -> Entity 시킴
+        Event event = modelMapper.map(eventDTO, Event.class);
+
         // 저장
         Event newEvent =  this.eventRepository.save(event);
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
