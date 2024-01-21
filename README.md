@@ -408,6 +408,41 @@ dependencies {
   }
   ```
 
+### ModelMapper
+
+- `DTO -> Entity` 혹은 `Entity -> DTO`와 같은 변환이 필요할 떄 유용한 **라이브러리**이다
+- DTO 사용 이유 ?
+  - 받은 값을 제한할 수 있다.
+  - 구현 시 Entity는 최대한 건들지 않는 것이 중요하다
+    - 이유로는 여러가지가 있겠지만 무결성을 유지하기 위해서이다 Entity를 수정하다보면 추후 개발이 어려워짐
+  - validation 체크 시에도 Entity만 사용하다 보면 너무 과도하게 어노테이션이 집중되어 클린한 코드가 되지 않기도 함
+- 단점
+
+  - 직접 코드를 입력하는 것보다는 속도는 느리나 Java 버전이 올라가면서 빨라짐.
+  - 세세한 컨트롤은 힘들다. 정말 받은 값을 변환하여 넣어주는 역할만 해준다.
+
+- 사용 방법
+
+  - 의존성 추가
+    - `implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.0'`
+  - Appliction에 Bean등록
+
+    ```java
+    @SpringBootApplication
+    public class RestApiApplication {
+
+      // Application Start Code 생략 ...
+
+      /** Dependencies에 추가한 ModelMapper를 빈으로 추가 */
+      @Bean
+      public ModelMapper modelMapper(){ return new ModelMapper(); }
+
+    }
+    ```
+
+  - 사용
+    - `Event event = modelMapper.map(eventDTO, Event.class);`
+
 <hr/>
 
 ## 유용한 intellij 단축키
