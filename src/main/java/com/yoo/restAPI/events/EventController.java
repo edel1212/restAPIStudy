@@ -38,7 +38,6 @@ public class EventController {
         // 저장
         Event newEvent =  this.eventRepository.save(event);
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
-        event.setId(999);
         return ResponseEntity.created(createdUri).body(event);
     }
 
