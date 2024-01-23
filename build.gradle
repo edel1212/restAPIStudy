@@ -39,6 +39,8 @@ dependencies {
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper Entity -> DTO
 	implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.0'
+	// @Valid 와 같은 체크
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('bootBuildImage') {

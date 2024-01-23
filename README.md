@@ -489,10 +489,6 @@ dependencies {
 
 ## Unkown Data 처리 방법
 
-- 원치 않는 추가적인 파라미터를 처리 하는 방법에는 여러가지 방법이 있다
-
-### Unkown properties 설정방법
-
 - `appilcation.properties` 설정을 통해 데이터가 Json -> DTO 변경 시 없는 데이터라면 BadRequest를 반환한다.
 - 사용 방법
   - `spring.jackson.deserialization.fail-on-unknown-properties=true`
@@ -501,6 +497,8 @@ dependencies {
 - 용어설명
   - `deserialization` : JSON 문자열 -> Java의 DTO Class로 매핑할 경우
   - `serialization` : Java의 DTO Class -> JSON 문자열로 매핑할 경우
+
+## 입력값이 이상한 경우 처리 방법
 
 ## 유용한 intellij 단축키
 
