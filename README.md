@@ -487,6 +487,21 @@ dependencies {
   - API 테스트 시 슬라이싱 테스트 보다 해당 방법을 선호한다.
   <hr/>
 
+## Unkown Data 처리 방법
+
+- 원치 않는 추가적인 파라미터를 처리 하는 방법에는 여러가지 방법이 있다
+
+### Unkown properties 설정방법
+
+- `appilcation.properties` 설정을 통해 데이터가 Json -> DTO 변경 시 없는 데이터라면 BadRequest를 반환한다.
+- 사용 방법
+  - `spring.jackson.deserialization.fail-on-unknown-properties=true`
+- 해당 설정은 deserialization 뿐만 아니라 serialization 설정도 할 수 있으니 참고하자.
+- 좀 더 타이트하게 API에 제한을 두고 싶을 때 사용하자 사용 유무는 권장이 아닌 개발 상황에 맞춰서 해주면 된다.
+- 용어설명
+  - `deserialization` : JSON 문자열 -> Java의 DTO Class로 매핑할 경우
+  - `serialization` : Java의 DTO Class -> JSON 문자열로 매핑할 경우
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
