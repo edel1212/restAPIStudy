@@ -149,4 +149,32 @@ public class EventControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    @DisplayName("ErrorSerializer 생성을 통해 JSON구조로 에러 받기")
+    void createEvent_Bad_Request_Error_Serializer()  throws  Exception{
+        EventDTO eventDTO = EventDTO.builder()
+                .name("Spring")
+                .description("Rest API Test")
+                .beginEnrollmentDateTime(LocalDateTime.now())
+                .closeEnrollmentDateTime(LocalDateTime.now())
+                .beginEventDateTime(LocalDateTime.now().minusYears(100)) // ❌ 이벤트 시작 날짜가 종료 날짜보다 100년 빠름
+                .endEventDateTime(LocalDateTime.now())
+                .basePrice(10_000)
+                .maxPrice(200)                                           // ❌ Base보다 Max가 훨씬 적음
+                .limitOfEnrollment(100)
+                .location("공릉역")
+                .build();
+
+
+        mockMvc.perform(
+                        post("/api/events")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaTypes.HAL_JSON)
+                                .content(objectMapper.writeValueAsString(eventDTO))
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                ;
+    }
 }
