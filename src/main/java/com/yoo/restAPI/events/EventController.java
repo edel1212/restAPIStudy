@@ -31,11 +31,20 @@ public class EventController {
     // Application에서 Bean등록 완료
     private final ModelMapper modelMapper;
 
+    private final EventValidator eventValidator;
+
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
         if(errors.hasErrors()){
             return ResponseEntity.badRequest().build();
         }
+
+        eventValidator.validate(eventDTO, errors);
+
+        if(errors.hasErrors()){
+            return ResponseEntity.badRequest().build();
+        }
+
         // 👉 modelMapper를 통해 DTO -> Entity 시킴
         Event event = modelMapper.map(eventDTO, Event.class);
 
