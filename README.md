@@ -500,6 +500,80 @@ dependencies {
 
 ## 입력값이 이상한 경우 처리 방법
 
+- `implementation 'org.springframework.boot:spring-boot-starter-validation'`를 디펜던시로 추가해 주자
+- Null 또는 Empty, Min, Max 처리 방법
+
+  - Controller 파라미터 내 `@Valid`를 사용해서 감시 대상으로 지정
+  - DTO 내부 변수 상단 `@NotEmpty`, `@NotNull`, `@Min(0)`, `@Max(0)` 어노테이션 지정을 통해 검증
+  - 해당 검증에 적합하지 못 할 시 `Errors`에 에러가 발생하여 돌아온다.
+  - `errors.hasErrors()`를 통해 예외 처리
+
+  ```java
+    @PostMapping
+    public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
+        if(errors.hasErrors()){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.created(createdUri).body(event);
+    }
+  ```
+
+- Validation 자체를 확인
+- 검증을 처리할 Class를 생성 후 `@Component`를 통해 Spring Bean에 등록
+- 메서드를 생성하여 검증 로직 작성 후 조건에 맞지 않을 시 `erros`에 에러 주입
+
+  - errors.rejectValue(필드명, 에러코드, 에러 메세지);
+
+- 사용 예시
+
+  - 검증 핸들러
+
+    ```java
+    @Component // Bean 등록
+    public class EventValidator {
+        public void validate(EventDTO eventDTO, Errors errors){
+            if(eventDTO.getBasePrice() > eventDTO.getMaxPrice()
+                && eventDTO.getMaxPrice() > 0 ){
+                  // 👉 rejectValue()를 통해 에러 주입
+                errors.rejectValue("basePrice", "wrongValue", "BasePrice is wrong");
+                errors.rejectValue("maxPrice", "wrongValue", "MaxPrice is wrong");
+            }
+
+            LocalDateTime eventEndTime =  eventDTO.getEndEventDateTime();
+            if(eventEndTime.isBefore(eventDTO.getBeginEventDateTime())){
+                errors.rejectValue("endEventDateTime", "wrongValue", " endEventDateTime is wrong");
+            }
+
+            // TODO 이런식이르 검증 로직을 만들어서 errors를 reject해준다.
+        }
+    }
+    ```
+
+- 사용 컨트롤러
+
+  ```java
+  @Controller
+  @RequiredArgsConstructor
+  @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE )
+  public class EventController {
+
+      private final EventValidator eventValidator;
+
+      @PostMapping
+      public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
+          // 👉 검증 핸들러 적용
+          eventValidator.validate(eventDTO, errors);
+
+          if(errors.hasErrors()){
+              return ResponseEntity.badRequest().build();
+          }
+
+          return ResponseEntity.created(createdUri).body(event);
+      }
+
+  }
+  ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함

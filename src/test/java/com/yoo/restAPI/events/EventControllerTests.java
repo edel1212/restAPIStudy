@@ -3,6 +3,7 @@ package com.yoo.restAPI.events;
 //import org.junit.Test; ❌ Junit4버전
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test; // 👍 Junit5버전
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -41,6 +42,7 @@ public class EventControllerTests {
     private ObjectMapper objectMapper;
 
     @Test
+    @DisplayName("정상 저장")
     public void createEvent() throws Exception {
         /** Given */
         EventDTO event = EventDTO.builder()
@@ -76,6 +78,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @DisplayName("DTO로 받는데 추가적인값을 더 받을 경우 예외 발생")
     public void createEvent_Bad_Request() throws Exception {
         /** Given */
         Event event = Event.builder()
@@ -108,6 +111,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @DisplayName("입력값 Null 검사")
     void createEvent_Bad_Request_Empty_Input()  throws  Exception{
         EventDTO eventDTO = EventDTO.builder().build();
         mockMvc.perform(
@@ -120,6 +124,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @DisplayName("입력값 유효성 검사")
     void createEvent_Bad_Request_Wrong_Input()  throws  Exception{
         EventDTO eventDTO = EventDTO.builder()
                 .name("Spring")
