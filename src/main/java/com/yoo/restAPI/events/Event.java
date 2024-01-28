@@ -2,6 +2,7 @@ package com.yoo.restAPI.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -33,7 +34,7 @@ public class Event {
      *    미사용시 enum의 순서로 저장되기에 순서가 바뀌면 위험해지기 떄문이다.
      * */
     @Enumerated(EnumType.STRING)
-    private EventStatus eventStatus;
+    private @Builder.Default EventStatus eventStatus = EventStatus.DRAFT;
 
     // 오프라인 구분
     private boolean offline;
@@ -53,4 +54,20 @@ public class Event {
     // (optional)
     private int maxPrice;
     private int limitOfEnrollment;
+
+    public void update() {
+        // Update Free
+        if(this.basePrice == 0 && this.maxPrice == 0){
+            this.free = true;
+        } else {
+            this.free = false;
+        }// if - else
+
+        // Update Offline
+        if( this.location == null || this.location.isBlank() ){
+            this.offline = false;
+        } else {
+            this.offline = true;
+        }
+    }
 }

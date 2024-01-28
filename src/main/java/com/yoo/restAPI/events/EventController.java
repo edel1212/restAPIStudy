@@ -48,6 +48,9 @@ public class EventController {
         // 👉 modelMapper를 통해 DTO -> Entity 시킴
         Event event = modelMapper.map(eventDTO, Event.class);
 
+        // 👉 원래는 서비스에서 로직 구현이 필요하나 간단한 로직이니 스킵함
+        event.update();
+
         // 저장
         Event newEvent =  this.eventRepository.save(event);
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();

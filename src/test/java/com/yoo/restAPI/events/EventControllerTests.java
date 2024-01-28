@@ -177,4 +177,68 @@ public class EventControllerTests {
                 .andDo(print())
                 ;
     }
+
+    @Test
+    @DisplayName("입력 값이 잘못된 경우 에러 발생 체크")
+    void createEvent_Bad_Request_Wrong_input() throws Exception{
+        EventDTO eventDTO = EventDTO.builder()
+                .name("Spring")
+                .description("Rest API Test")
+                .beginEnrollmentDateTime(LocalDateTime.now())
+                .closeEnrollmentDateTime(LocalDateTime.now())
+                .beginEventDateTime(LocalDateTime.now().minusYears(100)) // ❌ 이벤트 시작 날짜가 종료 날짜보다 100년 빠름
+                .endEventDateTime(LocalDateTime.now())
+                .basePrice(10_000)
+                .maxPrice(200)                                           // ❌ Base보다 Max가 훨씬 적음
+                .limitOfEnrollment(100)
+                .location("공릉역")
+                .build();
+
+
+        mockMvc.perform(
+                        post("/api/events")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaTypes.HAL_JSON)
+                                .content(objectMapper.writeValueAsString(eventDTO))
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+        ;
+    }
+
+    @Test
+    @DisplayName("입력 값이 잘못된 경우 에러 발생 체크")
+    void createEvent_Success() throws Exception{
+        EventDTO eventDTO = EventDTO.builder()
+                .name("Spring")
+                .description("Rest API Test")
+                .beginEnrollmentDateTime(LocalDateTime.now())
+                .closeEnrollmentDateTime(LocalDateTime.now().plusDays(7))
+                .beginEventDateTime(LocalDateTime.now())
+                .endEventDateTime(LocalDateTime.now().plusDays(10))
+                .basePrice(10_000)
+                .maxPrice(20_000)
+                .limitOfEnrollment(100)
+                .location("공릉역")
+                .build();
+
+
+        mockMvc.perform(
+                        post("/api/events")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaTypes.HAL_JSON)
+                                .content(objectMapper.writeValueAsString(eventDTO))
+                )
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("free").value(false))
+                .andExpect(jsonPath("offline").value(true))
+                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+        ;
+    }
 }
