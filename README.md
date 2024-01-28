@@ -656,6 +656,28 @@ dependencies {
   }
   ```
 
+## 스프링 HATEOAS
+
+- Docs
+  - https://docs.spring.io/spring-hateoas/docs/current/reference/html/
+- 기능
+  - 링크 만드는 기능
+    - 문자열 가지고 만들기
+    - 컨트롤러와 메소드로 만들기
+    - ex) `WebMvcLinkBuilder.linkTo()` and `WebMvcLinkBuilder.methodOn()` 사용
+  - 리소스 만드는 기능
+    - 리소스: 데이터 + 링크
+  - 링크 찾아주는 기능
+    - Traverson
+    - LinkDiscoverers
+- 링크
+  - HREF (hypertext reference) : 링크 주소
+  - REL (Relation) : rel 속성은 현재 문서와 외부 리소스 사이의 연관 관계를 명시합니다.
+    - self
+    - profile
+    - update-event
+    - query-events
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
