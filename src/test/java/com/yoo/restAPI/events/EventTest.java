@@ -1,6 +1,11 @@
 package com.yoo.restAPI.events;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -81,5 +86,31 @@ class EventTest {
 
         // Then
         assertThat(event.isOffline()).isFalse();
+    }
+
+    /*****************/
+    // Refactoring
+    @ParameterizedTest //👉 해당 어노테이션을 사용하면 여러개의 테스트 케이스를 한번에 실행 가능
+    @MethodSource("provideFree")
+    public void testFree_Refactoring(int basePrice, int maxPrice, boolean expected) {
+        // Given
+        Event event = Event.builder()
+                .basePrice(basePrice)
+                .maxPrice(maxPrice)
+                .build();
+
+        // When
+        event.update();
+
+        // Then
+        assertThat(event.isFree()).isEqualTo(expected);
+
+    }
+
+    private static Stream<Arguments> provideFree() {
+        return Stream.of(
+                Arguments.of(0, 0, true),
+                Arguments.of(1_000, 0, true) 
+        );
     }
 }
