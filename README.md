@@ -574,6 +574,88 @@ dependencies {
   }
   ```
 
+## Paramter를 받아 Test코드 작성
+
+- 이전 작성했던 테스트 코드를 보면 불필요하게 반복되는 코드가 있는걸 발견 할 수있다.
+
+  ```java
+  @Test
+    void testFree() {
+        // Given
+        Event event = Event.builder()
+                .basePrice(0)
+                .maxPrice(0)
+                .build();
+
+        // When
+        event.update();
+
+        // Then
+        assertThat(event.isFree()).isTrue();
+
+        /**************/
+
+        // Given
+        event = Event.builder()
+                .basePrice(1000)
+                .maxPrice(0)
+                .build();
+
+        // When
+        event.update();
+
+        // Then
+        assertThat(event.isFree()).isFalse();
+    }
+  ```
+
+- 위의 해당 코드는 Given 값과 Then 결과를 제외하고는 전부 같은 코드인것을 확인 할 수 있다.
+- 이러한 반복 코드는 파리미터를 받아와 처리가 가능하다.
+- JUnit 버전별 차이점
+- JUnit4를 사용할 경우 `JUnitParams`를 디펜던시에 추가하여 처리가 가능하나 대부분의 추세는 JUnit5를 사용하므로 제외한다.
+- JUnit5를 사용할 경우 추가적인 디펜던시 없이 처리가 가능하다.
+- 사용 방법
+  - 필수
+    - `@ParameterizedTest`를 이용하면 여러 개의 테스트 케이스를 사용할 수 있다.
+  - 이후 선택
+    - `@ValueSource`: 한 개의 인수 입력 시 사용
+    - `@CsvSource`: 한 개의 인수와 해당 인수를 넣었을 때의 결과값 입력 시 사용
+    - `@NullSource`, `@EmptySource`, `@NullOrEmptySource`: null 또는 공백값에 대한 테스트 시 사용
+    - `@EnumSource`: Enum 값에 대한 테스트 시 사용
+    - `@MethodSource`: 테스트에 복잡한 인수를 제공하고자 할 때 메소드를 만들어서 사용
+- 개인적인 생각
+  - Type Safety를 위해서 `@MethodSource`위주로 사용하자
+- 예시
+
+  ```java
+  // 👉 해당 Stream의 순서대로 값이 들어간다.
+  private static Stream<Arguments> provideFree() {
+      return Stream.of( // 횟수
+              // 각각의 argument는 순서대로 테스트의 파라미터 값
+              Arguments.of(0, 0, true),
+              Arguments.of(1_000, 0, true)
+      );
+  }
+
+  @DisplayName("파리머터를 통해 여러번 테스트가 가능")
+  @ParameterizedTest //👉 해당 어노테이션을 사용하면 여러개의 테스트 케이스를 한번에 실행 가능
+  @MethodSource("provideFree")  // ✨ 들어갈 메서드명 주입
+  public void testFree_Refactoring(int basePrice, int maxPrice, boolean expected) {
+      // Given
+      Event event = Event.builder()
+              .basePrice(basePrice)
+              .maxPrice(maxPrice)
+              .build();
+
+      // When
+      event.update();
+
+      // Then
+      assertThat(event.isFree()).isEqualTo(expected);
+
+  }
+  ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
