@@ -265,18 +265,21 @@ public class EventControllerTests {
         mockMvc.perform(
                         post("/api/events")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .accept(MediaTypes.HAL_JSON) // HATOAS를 Import 해줘야 함
-                                // 💬 Body 값 등록
+                                .accept(MediaTypes.HAL_JSON)
                                 .content(objectMapper.writeValueAsString(event))
                 )
                 .andDo(print())
                 /** Then */
-                .andExpect(status().isCreated())                     // 성공일 경우 201 반환
-                .andExpect(jsonPath("id").exists())        // 응답 값에 id가 있는지 확인
-                .andExpect(header().exists(HttpHeaders.LOCATION))    // 응답 로케이션 유무 확인
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)) // Content-Type 체크
-                .andExpect(jsonPath("id").value(Matchers.not(100)))                         // DTO에서 커트!! 그렇기에 없음
-                .andExpect(jsonPath("free").value(Matchers.not(true)))                      // DTO에서 커트!! 그렇기에 없음
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                // 👉 Link를 가지는지 체크
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists())
 
         ;
     }
