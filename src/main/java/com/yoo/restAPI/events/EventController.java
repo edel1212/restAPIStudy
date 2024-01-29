@@ -3,6 +3,7 @@ package com.yoo.restAPI.events;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
@@ -58,12 +59,12 @@ public class EventController {
         WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
 
         URI createdUri = selfLinkBuilder.toUri();
+        EntityModel<Event> eventEntityModel = EntityModel.of(newEvent);
+        eventEntityModel.add(linkTo(EventController.class).withRel("query-events"));
+        eventEntityModel.add(selfLinkBuilder.withSelfRel());   // 👉 withSelfRel()를 사용해서 자기 자신 사용
+        eventEntityModel.add(selfLinkBuilder.withRel("update-event"));
 
-        EventResource eventResource = new EventResource(event);
-        eventResource.add(linkTo(EventController.class).withRel("query-events"));
-        eventResource.add(selfLinkBuilder.withSelfRel());   // 👉 withSelfRel()를 사용해서 자기 자신 사용
-        eventResource.add(selfLinkBuilder.withRel("update-event"));
-        return ResponseEntity.created(createdUri).body(eventResource);
+        return ResponseEntity.created(createdUri).body(eventEntityModel);
     }
 
 }
