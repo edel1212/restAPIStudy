@@ -48,9 +48,10 @@ public class EventControllerTests {
         EventDTO event = EventDTO.builder()
                 .name("Spring")
                 .description("Rest API Test")
-                .beginEventDateTime(LocalDateTime.now().minusDays(2))
-                .closeEnrollmentDateTime(LocalDateTime.now())
-                .endEventDateTime(LocalDateTime.now())
+                .beginEnrollmentDateTime(LocalDateTime.now())
+                .closeEnrollmentDateTime(LocalDateTime.now().plusDays(10))
+                .beginEventDateTime(LocalDateTime.now())
+                .endEventDateTime(LocalDateTime.now().plusDays(10))
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
@@ -241,4 +242,43 @@ public class EventControllerTests {
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
         ;
     }
+
+
+    @Test
+    @DisplayName("HAL_JSON 체크")
+    public void createEvent_HATEOAS() throws Exception {
+        /** Given */
+        EventDTO event = EventDTO.builder()
+                .name("Spring")
+                .description("Rest API Test")
+                .beginEnrollmentDateTime(LocalDateTime.now())
+                .closeEnrollmentDateTime(LocalDateTime.now().plusDays(10))
+                .beginEventDateTime(LocalDateTime.now())
+                .endEventDateTime(LocalDateTime.now().plusDays(10))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("공릉역")
+                .build();
+
+        /** When */
+        mockMvc.perform(
+                        post("/api/events")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaTypes.HAL_JSON) // HATOAS를 Import 해줘야 함
+                                // 💬 Body 값 등록
+                                .content(objectMapper.writeValueAsString(event))
+                )
+                .andDo(print())
+                /** Then */
+                .andExpect(status().isCreated())                     // 성공일 경우 201 반환
+                .andExpect(jsonPath("id").exists())        // 응답 값에 id가 있는지 확인
+                .andExpect(header().exists(HttpHeaders.LOCATION))    // 응답 로케이션 유무 확인
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)) // Content-Type 체크
+                .andExpect(jsonPath("id").value(Matchers.not(100)))                         // DTO에서 커트!! 그렇기에 없음
+                .andExpect(jsonPath("free").value(Matchers.not(true)))                      // DTO에서 커트!! 그렇기에 없음
+
+        ;
+    }
+
 }
