@@ -715,6 +715,27 @@ dependencies {
   }
   ```
 
+## Rest Docs
+
+- 테스트 코드 기반으로 Restful API 문서를 돕는 라이브라리이다.
+- API Spec과 문서화를 위한 테스트 코드가 일치하지 않으면 테스트 빌드를 실패하게 되어 테스트 코드로 검증된 문서를 보장할 수 있습니다.
+- Swagger 또한 가능한 기능인데 왜 써야할까?
+
+  - Swagger는 API를 테스트해 볼 수 있는 화면을 제공하여 동작 테스트하는 용도에 조금 더 특화되어있습니다.
+  - 테스트 기반이 아니기에 문서가 100% 정확하다고 확신할 수 없다.
+  - 로직에 애노테이션을 통해 명세를 작성하게 되는데 지속적으로 사용하게 된다면 명세를 위한 코드들이 많이 붙게되어 전체적으로 가독성이 떨어진다.
+  - Swagger 사용 시 예시
+
+    ```java
+    public class SignupForm {
+      @ApiModelProperty(value = "카카오 id", required = true, example = "1")
+      private Long id;
+
+      @ApiModelProperty(value = "카카오 image url", required = true, example = "\"http://k.kakaocdn.net\"")
+      private String imageFileUrl;
+    }
+    ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
