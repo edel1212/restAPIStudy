@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
@@ -59,11 +60,10 @@ public class EventController {
         // 💬 EntityModel<대상>을 통해 _Link를 생성 할 수 있는 HATEOAS 컨테이너 객체 생성
         EntityModel<Event> eventEntityModel = EntityModel.of(newEvent);
 
-        // TODO .. 내일 설명 이어서 ...
 
         WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
         URI createdUri = selfLinkBuilder.toUri();
-
+        // eventEntityModel.add(Link.of("http://localhost:8080/??"));  ❌ 와 같지만 타입 세이프티하지 않음!!
         eventEntityModel.add(linkTo(EventController.class).withRel("query-events"));
         eventEntityModel.add(selfLinkBuilder.withSelfRel());   // 👉 withSelfRel()를 사용해서 자기 자신 사용
         eventEntityModel.add(selfLinkBuilder.withRel("update-event"));

@@ -678,6 +678,43 @@ dependencies {
     - update-event
     - query-events
 
+### EntityModel을 사용하여 `_link` 추가
+
+- \_Link를 생성 할 수 있는 HATEOAS 컨테이너 객체 생성하는 기능을 제공한다.
+- 이전 2.X 초반 SpringBoot에서는 따로 Class 생성 후 Resourse<T>를 상속 받아 구현 하였지만 버전이 바뀌면서 변경되었다.
+  - ex) `public class EventResource extends Resource<Event>` 이후 super를 통한 생성자 필요
+- `EntityModel<T>` 사용 방법
+
+  ```java
+  @PostMapping
+  public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
+
+      // 저장
+      Event newEvent =  this.eventRepository.save(event);
+
+      // 💬 EntityModel<대상>을 통해 _Link를 생성 할 수 있는 HATEOAS 컨테이너 객체 생성
+      EntityModel<Event> eventEntityModel = EntityModel.of(newEvent);
+
+      // 👉 현재 사용하는 Class의 주소 정보를 읽어서 가져옴
+      WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+      URI createdUri = selfLinkBuilder.toUri();
+
+      // ⭐️ HATEOAS 컨테이너 객체 내 add이벤트를 통해 _link 생성
+      /** _link.query-events */
+      eventEntityModel.add(linkTo(EventController.class).withRel("query-events"));
+      /** _link.self */
+      eventEntityModel.add(selfLinkBuilder.withSelfRel());   // 👉 withSelfRel()를 사용해서 자기 자신 사용
+      /** _link.self */
+      eventEntityModel.add(selfLinkBuilder.withRel("update-event"));
+
+      // ❌ eventEntityModel.add(Link.of("http://localhost:8080/??")); linkTo()를 사용하자 이건 타입 세이프티하지 않음!!
+
+      // 👉 created()에 들어가면 header에 생성된다.
+      // Headers = [Location:"http://localhost/api/events/1", Content-Type:"application/hal+json"]
+      return ResponseEntity.created(createdUri).body(eventEntityModel);
+  }
+  ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
