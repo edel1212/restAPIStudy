@@ -780,6 +780,48 @@ dependencies {
   }
   ```
 
+### RestDocsMockMvcConfigurationCustomizer 적용
+
+- 위의 상태로 만들어진 doc내용을 보면 보기 힘든 형태로 되어있는것을 볼 수 있다.
+  - 이러한 문서를 해당 클래스를 사용해서 커스텀하면 내가 원하는 형태로 변경이 가능하다.
+- 사용 방법
+
+  - test 디렉토리 내부 common 디렉토리 생성 후 class 파일 생성
+  - `@TestConfiguration` 테스트용 설정 어노테이션 추가
+  - RestDocsMockMvcConfigurationCustomizer 클래스 생성 후 `@Bean`등록
+
+    ```java
+    package com.yoo.restAPI.common;
+
+    import org.springframework.boot.test.autoconfigure.restdocs.RestDocsMockMvcConfigurationCustomizer;
+    import org.springframework.boot.test.context.TestConfiguration;
+    import org.springframework.context.annotation.Bean;
+
+    import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+
+    @TestConfiguration // ✨ 테스트용 설정
+    public class RestDocsConfiguration {
+        @Bean // ✨ Bean Factory 스캔 대상 추가
+        public RestDocsMockMvcConfigurationCustomizer restDocsMockMvcBuilderCustomizer(){
+            return config -> config.operationPreprocessors()
+                    // ✏️ prettyPrint() 살정을 통해 요청, 응답 커스텀
+                    .withResponseDefaults(prettyPrint())
+                    .withRequestDefaults(prettyPrint());
+        }
+    }
+    ```
+
+  - 실제 테스트 부분에 `@Import(대상)`를 사용해서 지정
+    ```java
+    @SpringBootTest
+    @AutoConfigureMockMvc
+    @AutoConfigureRestDocs
+    @Import(RestDocsConfiguration.class)    // 💬 만들어준 RestDocsConfiguration를 등록 사용
+    public class EventControllerTests {
+        // Test Code ...
+    }
+    ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
