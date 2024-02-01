@@ -3,6 +3,7 @@ package com.yoo.restAPI.events;
 //import org.junit.Test; ❌ Junit4버전
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yoo.restAPI.common.RestDocsConfiguration;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs // 1 해당 어노테이션을 선언해서 사용한다 지정
+@Import(RestDocsConfiguration.class)    // 💬 Docs 형식 pretty
 public class EventControllerTests {
 
     /**
