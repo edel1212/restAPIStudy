@@ -736,6 +736,50 @@ dependencies {
     }
     ```
 
+- 사용 방법
+
+  - 테스트 코드에 작성해야한다.
+  - 테스트가 성공해야지만 문서가 만들어진다.
+  - 문서의 생성 위치는 따로 설정하지 않았다면 `build -> generated-snippets -> 설정한 doucument명` 위치에 생성된다.
+  - `@AutoConfigureRestDocs` 어노테이션을 테스트 class 최상단에 달아줘야한다.
+
+  ```java
+  import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+  import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+
+  @SpringBootTest
+  @AutoConfigureMockMvc
+  @AutoConfigureRestDocs // ✨ 1. snippset을 만들 것이라는 어노테이션 지정
+  public class EventControllerTests {
+    @Autowired
+    private MockMvc mockMvc;  // ✨ 2. mockMvc기반 테스트로 만들어지므로 지정
+
+    @Test
+    @DisplayName("HAL_JSON 체크")
+    public void createEvent_HATEOAS() throws Exception {
+        /** Given */
+        EventDTO event = EventDTO.builder().build();
+
+        /** When */
+        mockMvc.perform(
+                        post("/api/events")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaTypes.HAL_JSON)
+                                .content(objectMapper.writeValueAsString(event))
+                )
+                .andDo(print())
+                /** Then */
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists())
+                // ✨ 3. document()로 이름을 지정하여 Rest Docs 생성
+                .andDo(document("create-event"))
+
+        ;
+    }
+  }
+  ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
