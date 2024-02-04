@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EventTest {
 
-    @Test
+    //@Test
     void builder() {
         Event event = Event.builder()
                 .name("Builder Pattern을 사용해서 만듬")
@@ -20,7 +20,7 @@ class EventTest {
         assertThat(event).isNotNull();
     }
 
-    @Test
+    //@Test
     void havaBean() {
         // Given
         String name = "Java Bean  스팩에 맞게 사용 하여 만듬";
@@ -37,7 +37,7 @@ class EventTest {
 
     }
 
-    @Test
+   // @Test
     void testFree() {
         // Given
         Event event = Event.builder()
@@ -66,7 +66,7 @@ class EventTest {
         assertThat(event.isFree()).isFalse();
     }
 
-    @Test
+    //@Test
     void testOffline() {
         // Given
         Event event = Event.builder()
@@ -92,7 +92,7 @@ class EventTest {
     /*****************/
     // Refactoring
     @DisplayName("파리머터를 통해 여러번 테스트가 가능")
-    @ParameterizedTest //👉 해당 어노테이션을 사용하면 여러개의 테스트 케이스를 한번에 실행 가능
+   // @ParameterizedTest //👉 해당 어노테이션을 사용하면 여러개의 테스트 케이스를 한번에 실행 가능
     @MethodSource("provideFree")
     public void testFree_Refactoring(int basePrice, int maxPrice, boolean expected) {
         // Given

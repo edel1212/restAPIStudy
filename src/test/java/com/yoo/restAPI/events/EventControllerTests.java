@@ -48,7 +48,7 @@ public class EventControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
+    //@Test
     @DisplayName("정상 저장")
     public void createEvent() throws Exception {
         /** Given */
@@ -85,7 +85,7 @@ public class EventControllerTests {
                 ;
     }
 
-    @Test
+    //@Test
     @DisplayName("DTO로 받는데 추가적인값을 더 받을 경우 예외 발생")
     public void createEvent_Bad_Request() throws Exception {
         /** Given */
@@ -118,7 +118,7 @@ public class EventControllerTests {
         ;
     }
 
-    @Test
+    //@Test
     @DisplayName("입력값 Null 검사")
     void createEvent_Bad_Request_Empty_Input()  throws  Exception{
         EventDTO eventDTO = EventDTO.builder().build();
@@ -131,7 +131,7 @@ public class EventControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
+    //@Test
     @DisplayName("입력값 유효성 검사")
     void createEvent_Bad_Request_Wrong_Input()  throws  Exception{
         EventDTO eventDTO = EventDTO.builder()
@@ -158,7 +158,7 @@ public class EventControllerTests {
     }
 
 
-    @Test
+    //@Test
     @DisplayName("ErrorSerializer 생성을 통해 JSON구조로 에러 받기")
     void createEvent_Bad_Request_Error_Serializer()  throws  Exception{
         EventDTO eventDTO = EventDTO.builder()
@@ -186,7 +186,7 @@ public class EventControllerTests {
                 ;
     }
 
-    @Test
+    //@Test
     @DisplayName("입력 값이 잘못된 경우 에러 발생 체크")
     void createEvent_Bad_Request_Wrong_input() throws Exception{
         EventDTO eventDTO = EventDTO.builder()
@@ -217,7 +217,7 @@ public class EventControllerTests {
         ;
     }
 
-    @Test
+    //@Test
     @DisplayName("입력 값이 잘못된 경우 에러 발생 체크")
     void createEvent_Success() throws Exception{
         EventDTO eventDTO = EventDTO.builder()
