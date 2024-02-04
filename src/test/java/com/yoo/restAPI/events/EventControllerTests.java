@@ -15,11 +15,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -283,7 +288,59 @@ public class EventControllerTests {
                 .andExpect(jsonPath("_links.query-events").exists())
                 .andExpect(jsonPath("_links.update-event").exists())
                 // ✏️ Rest Docs 생성
-                .andDo(document("create-event"))
+                .andDo(document("create-event",
+                        // 👉 Link에 관련된 문서 조각이 생성된다!! Document만 사용하면 생성되지 않음  :: links.adoc 파일이 생성됨
+                        links(
+                                linkWithRel("self").description("link to self")
+                                , linkWithRel("query-events").description("link to query-events")
+                                , linkWithRel("update-event").description("link to update-event")
+                        ),
+                        // 👉 Header 관련 문서 조각 생성 :: request-headers.adoc 생성
+                        requestHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type")
+                                , headerWithName(HttpHeaders.ACCEPT).description("accept")
+                        ),
+                        // 👉 요청에 필요한 필드목록 :: request-fields.adoc 생성
+                        requestFields(
+                                PayloadDocumentation.fieldWithPath("name").description("Name fof new Event")
+                                , PayloadDocumentation.fieldWithPath("description").description("description of new Event")
+                                , PayloadDocumentation.fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("beginEventDateTime").description("beginEventDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("endEventDateTime").description("endEventDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("location").description("location of new Event")
+                                , PayloadDocumentation.fieldWithPath("basePrice").description("basePrice of new Event")
+                                , PayloadDocumentation.fieldWithPath("maxPrice").description("maxPrice of new Event")
+                                , PayloadDocumentation.fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new Event")
+                        ),
+                        // ✍️ 응답 Header 문서 조각 생성 :: response-header.adoc 생성
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("Location Header")
+                                , headerWithName(HttpHeaders.CONTENT_TYPE).description("Content Type")
+                        ) ,
+                        // ✍️ 응답 field 문서 조각 :: response-field.adoc 생성
+                        responseFields(  // ✨ 모든 필드를 검증하여 문서화 하고싶을 경우 사용 :: 현재 link부분을 또한번  추가하지 않으면 에러 발생 .. 왜지 ..links()에서 검사하는데..
+                        // 👎 relaxedResponseFields( // ✏️ 아래 작성한 필드들만 문서로 만들어줌  <<< 단점으로는 정확한 문서화가 되지 않음 , 장점 문서 일부분만 테스트가 가능하다 :: 비추천!! 확살하지 않아짐
+                                PayloadDocumentation.fieldWithPath("id").description("New Id")
+                                , PayloadDocumentation.fieldWithPath("name").description("Name fof new Event")
+                                , PayloadDocumentation.fieldWithPath("description").description("description of new Event")
+                                , PayloadDocumentation.fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("beginEventDateTime").description("beginEventDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("endEventDateTime").description("endEventDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("location").description("location of new Event")
+                                , PayloadDocumentation.fieldWithPath("basePrice").description("basePrice of new Event")
+                                , PayloadDocumentation.fieldWithPath("maxPrice").description("maxPrice of new Event")
+                                , PayloadDocumentation.fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new Event")
+                                , PayloadDocumentation.fieldWithPath("free").description("is it free??")
+                                , PayloadDocumentation.fieldWithPath("offline").description("is it offline??")
+                                , PayloadDocumentation.fieldWithPath("eventStatus").description("event status")
+                                , PayloadDocumentation.fieldWithPath("_links.self.href").description("self!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                                , PayloadDocumentation.fieldWithPath("_links.update-event.href").description("update-event!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                                , PayloadDocumentation.fieldWithPath("_links.query-events.href").description("query-events!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                        )
+
+                ))
 
         ;
     }
