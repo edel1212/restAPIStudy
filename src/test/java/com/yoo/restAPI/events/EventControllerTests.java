@@ -250,10 +250,47 @@ public class EventControllerTests {
         ;
     }
 
+    @Test
+    @DisplayName("HAL_JSON 체크 ")
+    public void createEvent_HATEOAS() throws Exception {
+        /** Given */
+        EventDTO event = EventDTO.builder()
+                .name("Spring")
+                .description("Rest API Test")
+                .beginEnrollmentDateTime(LocalDateTime.now())
+                .closeEnrollmentDateTime(LocalDateTime.now().plusDays(10))
+                .beginEventDateTime(LocalDateTime.now())
+                .endEventDateTime(LocalDateTime.now().plusDays(10))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("공릉역")
+                .build();
+
+        /** When */
+        mockMvc.perform(
+                        post("/api/events")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaTypes.HAL_JSON)
+                                .content(objectMapper.writeValueAsString(event))
+                )
+                .andDo(print())
+                /** Then */
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                // 👉 Link를 가지는지 체크
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists());
+    }
 
     @Test
-    @DisplayName("HAL_JSON 체크")
-    public void createEvent_HATEOAS() throws Exception {
+    @DisplayName("create-event :: snippets 생성")
+    public void createEvent_Snippets() throws Exception {
         /** Given */
         EventDTO event = EventDTO.builder()
                 .name("Spring")
@@ -320,7 +357,7 @@ public class EventControllerTests {
                         ) ,
                         // ✍️ 응답 field 문서 조각 :: response-field.adoc 생성
                         responseFields(  // ✨ 모든 필드를 검증하여 문서화 하고싶을 경우 사용 :: 현재 link부분을 또한번  추가하지 않으면 에러 발생 .. 왜지 ..links()에서 검사하는데..
-                        // 👎 relaxedResponseFields( // ✏️ 아래 작성한 필드들만 문서로 만들어줌  <<< 단점으로는 정확한 문서화가 되지 않음 , 장점 문서 일부분만 테스트가 가능하다 :: 비추천!! 확살하지 않아짐
+                                // 👎 relaxedResponseFields( // ✏️ 아래 작성한 필드들만 문서로 만들어줌  <<< 단점으로는 정확한 문서화가 되지 않음 , 장점 문서 일부분만 테스트가 가능하다 :: 비추천!! 확살하지 않아짐
                                 PayloadDocumentation.fieldWithPath("id").description("New Id")
                                 , PayloadDocumentation.fieldWithPath("name").description("Name fof new Event")
                                 , PayloadDocumentation.fieldWithPath("description").description("description of new Event")
