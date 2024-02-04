@@ -781,10 +781,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     -d '{
   "name" : "Spring",
   "description" : "Rest API Test",
-  "beginEnrollmentDateTime" : "2024-02-04T20:50:02.391616",
-  "closeEnrollmentDateTime" : "2024-02-14T20:50:02.39163",
-  "beginEventDateTime" : "2024-02-04T20:50:02.391636",
-  "endEventDateTime" : "2024-02-14T20:50:02.391639",
+  "beginEnrollmentDateTime" : "2024-02-04T22:05:56.789162",
+  "closeEnrollmentDateTime" : "2024-02-14T22:05:56.789177",
+  "beginEventDateTime" : "2024-02-04T22:05:56.789181",
+  "endEventDateTime" : "2024-02-14T22:05:56.789182",
   "location" : "공릉역",
   "basePrice" : 100,
   "maxPrice" : 200,
@@ -798,21 +798,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
-Location: http://localhost:8080/api/events/1
+Location: http://localhost:8080/api/events/2
 Content-Type: application/hal+json
-Content-Length: 715
+Content-Length: 799
 
 {
-  "id" : 1,
+  "id" : 2,
   "eventStatus" : "DRAFT",
   "offline" : true,
   "free" : false,
   "name" : "Spring",
   "description" : "Rest API Test",
-  "beginEnrollmentDateTime" : "2024-02-04T20:50:02.391616",
-  "closeEnrollmentDateTime" : "2024-02-14T20:50:02.39163",
-  "beginEventDateTime" : "2024-02-04T20:50:02.391636",
-  "endEventDateTime" : "2024-02-14T20:50:02.391639",
+  "beginEnrollmentDateTime" : "2024-02-04T22:05:56.789162",
+  "closeEnrollmentDateTime" : "2024-02-14T22:05:56.789177",
+  "beginEventDateTime" : "2024-02-04T22:05:56.789181",
+  "endEventDateTime" : "2024-02-14T22:05:56.789182",
   "location" : "공릉역",
   "basePrice" : 100,
   "maxPrice" : 200,
@@ -822,10 +822,13 @@ Content-Length: 715
       "href" : "http://localhost:8080/api/events"
     },
     "self" : {
-      "href" : "http://localhost:8080/api/events/1"
+      "href" : "http://localhost:8080/api/events/2"
     },
     "update-event" : {
-      "href" : "http://localhost:8080/api/events/1"
+      "href" : "http://localhost:8080/api/events/2"
+    },
+    "profile" : {
+      "href" : "/docs/index.html#resources-events-create"
     }
   }
 }</code></pre>
@@ -857,6 +860,10 @@ Content-Length: 715
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>update-event</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">link to update-event</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>profile</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">profile!!!!</p></td>
 </tr>
 </tbody>
 </table>

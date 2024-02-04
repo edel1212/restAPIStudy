@@ -288,7 +288,7 @@ public class EventControllerTests {
                 .andExpect(jsonPath("_links.update-event").exists());
     }
 
-    @Test
+    //@Test
     @DisplayName("create-event :: snippets 생성")
     public void createEvent_Snippets() throws Exception {
         /** Given */
@@ -382,4 +382,90 @@ public class EventControllerTests {
         ;
     }
 
+
+    @Test
+    @DisplayName("create-event :: profile 추가")
+    public void createEvent_Snippets_Add_Profile() throws Exception {
+        /** Given */
+        EventDTO event = EventDTO.builder()
+                .name("Spring")
+                .description("Rest API Test")
+                .beginEnrollmentDateTime(LocalDateTime.now())
+                .closeEnrollmentDateTime(LocalDateTime.now().plusDays(10))
+                .beginEventDateTime(LocalDateTime.now())
+                .endEventDateTime(LocalDateTime.now().plusDays(10))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("공릉역")
+                .build();
+
+        /** When */
+        mockMvc.perform(
+                        post("/api/events")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaTypes.HAL_JSON)
+                                .content(objectMapper.writeValueAsString(event))
+                )
+                .andDo(print())
+                /** Then */
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andDo(document("create-event",
+                        links(
+                                linkWithRel("self").description("link to self")
+                                , linkWithRel("query-events").description("link to query-events")
+                                , linkWithRel("update-event").description("link to update-event")
+                                // ✏️ 프로필 검사
+                                , linkWithRel("profile").description("profile!!!!")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type")
+                                , headerWithName(HttpHeaders.ACCEPT).description("accept")
+                        ),
+                        requestFields(
+                                PayloadDocumentation.fieldWithPath("name").description("Name fof new Event")
+                                , PayloadDocumentation.fieldWithPath("description").description("description of new Event")
+                                , PayloadDocumentation.fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("beginEventDateTime").description("beginEventDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("endEventDateTime").description("endEventDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("location").description("location of new Event")
+                                , PayloadDocumentation.fieldWithPath("basePrice").description("basePrice of new Event")
+                                , PayloadDocumentation.fieldWithPath("maxPrice").description("maxPrice of new Event")
+                                , PayloadDocumentation.fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new Event")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("Location Header")
+                                , headerWithName(HttpHeaders.CONTENT_TYPE).description("Content Type")
+                        ) ,
+                        responseFields(
+                                PayloadDocumentation.fieldWithPath("id").description("New Id")
+                                , PayloadDocumentation.fieldWithPath("name").description("Name fof new Event")
+                                , PayloadDocumentation.fieldWithPath("description").description("description of new Event")
+                                , PayloadDocumentation.fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("beginEventDateTime").description("beginEventDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("endEventDateTime").description("endEventDateTime of new Event")
+                                , PayloadDocumentation.fieldWithPath("location").description("location of new Event")
+                                , PayloadDocumentation.fieldWithPath("basePrice").description("basePrice of new Event")
+                                , PayloadDocumentation.fieldWithPath("maxPrice").description("maxPrice of new Event")
+                                , PayloadDocumentation.fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new Event")
+                                , PayloadDocumentation.fieldWithPath("free").description("is it free??")
+                                , PayloadDocumentation.fieldWithPath("offline").description("is it offline??")
+                                , PayloadDocumentation.fieldWithPath("eventStatus").description("event status")
+                                , PayloadDocumentation.fieldWithPath("_links.self.href").description("self!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                                , PayloadDocumentation.fieldWithPath("_links.update-event.href").description("update-event!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                                , PayloadDocumentation.fieldWithPath("_links.query-events.href").description("query-events!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                                , PayloadDocumentation.fieldWithPath("_links.profile.href").description("프로필 이랍니다")
+                        )
+
+                ))
+
+        ;
+    }
 }

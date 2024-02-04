@@ -67,6 +67,8 @@ public class EventController {
         eventEntityModel.add(linkTo(EventController.class).withRel("query-events"));
         eventEntityModel.add(selfLinkBuilder.withSelfRel());   // 👉 withSelfRel()를 사용해서 자기 자신 사용
         eventEntityModel.add(selfLinkBuilder.withRel("update-event"));
+        // ✏️ 프로필 추가!
+        eventEntityModel.add(Link.of("/docs/index.html#resources-events-create").withRel("profile"));
 
         return ResponseEntity.created(createdUri).body(eventEntityModel);
     }
