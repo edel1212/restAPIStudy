@@ -822,6 +822,114 @@ dependencies {
     }
     ```
 
+### Snippet 필요 생성
+
+- `org.springframework.restdocs.~~` 클래스 내 메서드를 사용하여 만들 수 있다.
+- `document("지정폴더명"), ~~` 뒤 이이서 원하는 adocs를 만들 수 있다.
+- 각각의 메서드마다 생성되는 파일 및 목적이 다르다. - 각각 모두 테스트가 완료 돼야 생성된다.
+  - `links()` : Link에 관련된 문서 조각이 생성된다. (HAL_JSON)에서 생성되는 `_links:` 관련 데이터를 체크 및 생성
+  - `requestHeaders()` 요청 Header에 대한 문서 조각 생성
+  - `requestFields()` 요청 Body에 필요한 필드 값들 조각 생성
+  - `responseHeaders()` 응답 Header 생성
+  - `responseFields()` 응답 Body 생성
+- 사용 방법
+
+  ```java
+  @Test
+  @DisplayName("문서 조각 생성")
+  public void createEvent_HATEOAS() throws Exception {
+      /** Given */
+      EventDTO event = EventDTO.builder()
+              .name("Spring")
+              .description("Rest API Test")
+              .beginEnrollmentDateTime(LocalDateTime.now())
+              .closeEnrollmentDateTime(LocalDateTime.now().plusDays(10))
+              .beginEventDateTime(LocalDateTime.now())
+              .endEventDateTime(LocalDateTime.now().plusDays(10))
+              .basePrice(100)
+              .maxPrice(200)
+              .limitOfEnrollment(100)
+              .location("공릉역")
+              .build();
+
+      /** When */
+      mockMvc.perform(
+                      post("/api/events")
+                              .contentType(MediaType.APPLICATION_JSON_VALUE)
+                              .accept(MediaTypes.HAL_JSON)
+                              .content(objectMapper.writeValueAsString(event))
+              )
+              .andDo(print())
+              /** Then */
+              .andExpect(status().isCreated())
+              .andExpect(jsonPath("id").exists())
+              .andExpect(header().exists(HttpHeaders.LOCATION))
+              .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
+              .andExpect(jsonPath("id").value(Matchers.not(100)))
+              .andExpect(jsonPath("free").value(Matchers.not(true)))
+              // 👉 Link를 가지는지 체크
+              .andExpect(jsonPath("_links.self").exists())
+              .andExpect(jsonPath("_links.query-events").exists())
+              .andExpect(jsonPath("_links.update-event").exists())
+              // ✏️ Rest Docs 생성
+              .andDo(document("create-event",
+                      // 👉 Link에 관련된 문서 조각이 생성된다!! Document만 사용하면 생성되지 않음  :: links.adoc 파일이 생성됨
+                      links(
+                              linkWithRel("self").description("link to self")
+                              , linkWithRel("query-events").description("link to query-events")
+                              , linkWithRel("update-event").description("link to update-event")
+                      ),
+                      // 👉 Header 관련 문서 조각 생성 :: request-headers.adoc 생성
+                      requestHeaders(
+                              headerWithName(HttpHeaders.CONTENT_TYPE).description("content type")
+                              , headerWithName(HttpHeaders.ACCEPT).description("accept")
+                      ),
+                      // 👉 요청에 필요한 필드목록 :: request-fields.adoc 생성
+                      requestFields(
+                              PayloadDocumentation.fieldWithPath("name").description("Name fof new Event")
+                              , PayloadDocumentation.fieldWithPath("description").description("description of new Event")
+                              , PayloadDocumentation.fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime of new Event")
+                              , PayloadDocumentation.fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime of new Event")
+                              , PayloadDocumentation.fieldWithPath("beginEventDateTime").description("beginEventDateTime of new Event")
+                              , PayloadDocumentation.fieldWithPath("endEventDateTime").description("endEventDateTime of new Event")
+                              , PayloadDocumentation.fieldWithPath("location").description("location of new Event")
+                              , PayloadDocumentation.fieldWithPath("basePrice").description("basePrice of new Event")
+                              , PayloadDocumentation.fieldWithPath("maxPrice").description("maxPrice of new Event")
+                              , PayloadDocumentation.fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new Event")
+                      ),
+                      // ✍️ 응답 Header 문서 조각 생성 :: response-header.adoc 생성
+                      responseHeaders(
+                              headerWithName(HttpHeaders.LOCATION).description("Location Header")
+                              , headerWithName(HttpHeaders.CONTENT_TYPE).description("Content Type")
+                      ) ,
+                      // ✍️ 응답 field 문서 조각 :: response-field.adoc 생성
+                      responseFields(  // ✨ 모든 필드를 검증하여 문서화 하고싶을 경우 사용 :: 현재 link부분을 또한번  추가하지 않으면 에러 발생 .. 왜지 ..links()에서 검사하는데..
+                      // 👎 relaxedResponseFields( // ✏️ 아래 작성한 필드들만 문서로 만들어줌  <<< 단점으로는 정확한 문서화가 되지 않음 , 장점 문서 일부분만 테스트가 가능하다 :: 비추천!! 확살하지 않아짐
+                              PayloadDocumentation.fieldWithPath("id").description("New Id")
+                              , PayloadDocumentation.fieldWithPath("name").description("Name fof new Event")
+                              , PayloadDocumentation.fieldWithPath("description").description("description of new Event")
+                              , PayloadDocumentation.fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime of new Event")
+                              , PayloadDocumentation.fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime of new Event")
+                              , PayloadDocumentation.fieldWithPath("beginEventDateTime").description("beginEventDateTime of new Event")
+                              , PayloadDocumentation.fieldWithPath("endEventDateTime").description("endEventDateTime of new Event")
+                              , PayloadDocumentation.fieldWithPath("location").description("location of new Event")
+                              , PayloadDocumentation.fieldWithPath("basePrice").description("basePrice of new Event")
+                              , PayloadDocumentation.fieldWithPath("maxPrice").description("maxPrice of new Event")
+                              , PayloadDocumentation.fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new Event")
+                              , PayloadDocumentation.fieldWithPath("free").description("is it free??")
+                              , PayloadDocumentation.fieldWithPath("offline").description("is it offline??")
+                              , PayloadDocumentation.fieldWithPath("eventStatus").description("event status")
+                              , PayloadDocumentation.fieldWithPath("_links.self.href").description("self!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                              , PayloadDocumentation.fieldWithPath("_links.update-event.href").description("update-event!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                              , PayloadDocumentation.fieldWithPath("_links.query-events.href").description("query-events!!! 왜필요한지 모르겠다 위에서 links() 검사하는데 ..")
+                      )
+
+              ))
+
+      ;
+  }
+  ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
