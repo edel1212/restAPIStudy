@@ -930,6 +930,81 @@ dependencies {
   }
   ```
 
+## AscIIdocs
+
+- 설정 방법
+  - build.gralde 수정 필요
+    - `configurations` 내 asciidoctorExtensions 추가
+    - `tasks.named('asciidoctor')` 태스크 추가
+    - 생성 jar 명령어 추가 `bootJar `
+- 바탕이 될 doc를 추가해준다
+  - 경로 : `src -> docs[추가] -> asciidoc[추가] -> index.adoc`
+    - 기본 틀이될 형식은 만들어진거 복사해서 사용하자 - [링크](https://github.com/edel1212/restAPIStudy/blob/main/src/docs/asciidoc/index.adoc)
+- 이후 build를 실행하면 `resources->static->docs->index.html`로 변환 생성된다.
+- 주의 할점
+  - Test 코드 중 실패하는 코드가 있을 경우 에러를 반환하므로 주의하자!
+
+```gralde
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.7'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+}
+
+group = 'com.yoo'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	// ✨ asciidoc 생성을 위해 추가
+	asciidoctorExtensions
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('snippetsDir', file("build/generated-snippets"))
+}
+
+dependencies {
+	// ✨ asciidoc 생성을 위해 추가
+	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+tasks.named('test') {
+	outputs.dir snippetsDir
+	useJUnitPlatform()
+}
+
+tasks.named('asciidoctor') {
+	inputs.dir snippetsDir
+	// ✨ asciidoc 생성을 위해 추가
+	configurations 'asciidoctorExtensions'
+	dependsOn test
+}
+
+// ✨ asciidoc 생성을 위해 추가
+bootJar {
+	dependsOn asciidoctor
+
+	// build 경로 안에 있는 index.html을 밖으로 꺼내준다.
+	copy {
+		from "${asciidoctor.outputDir}"
+		into "src/main/resources/static/docs"   // src/main/resources/static/docs로 복사
+	}
+
+}
+```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
