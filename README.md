@@ -1005,6 +1005,16 @@ bootJar {
 }
 ```
 
+### 프로필 생성 방법
+
+- 간단하다 위에서 만들어진 asciidoc를 연동만 해주면 해결이다.
+- 코드
+  - Controller
+    ```java
+    // ✏️ 프로필 추가! asciidocs 를 통해 생성된 html파일 링크임!
+    eventEntityModel.add(Link.of("/docs/index.html#resources-events-create").withRel("profile"));
+    ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
