@@ -16,6 +16,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs // 1 해당 어노테이션을 선언해서 사용한다 지정
 @Import(RestDocsConfiguration.class)    // 💬 Docs 형식 pretty
+@ActiveProfiles("test")
 public class EventControllerTests {
 
     /**
