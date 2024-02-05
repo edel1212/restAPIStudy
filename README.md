@@ -1015,6 +1015,50 @@ bootJar {
     eventEntityModel.add(Link.of("/docs/index.html#resources-events-create").withRel("profile"));
     ```
 
+## DB 분리하기
+
+- 설정에서 중복된 부분은 같이 사용하고 필요한 부분은 test용에 맞춰 사용
+- 실사용 DB : `postgres`, 테스트 DB : `h2` 설정
+- 방법
+  - h2 DB를 test scope로 지정
+    - `testImplementation 'com.h2database:h2'`
+  - `application-test.properties` 생성 profile 지정이 가능하게 끔 "-"를 사용해 생성해 주자
+  - 테스트 코드내 `@ActiveProfiles("대상")` 지정을 통해 사용하자
+- 코드
+
+  - build.gradle
+    ```groovy
+    dependencies {
+      // ✨ Test scope로 변경
+      testImplementation 'com.h2database:h2'
+    }
+    ```
+  - application-test.porperties - test용 설정
+
+    ```properties
+    spring.datasource.username=sa
+    spring.datasource.password=
+    spring.datasource.url=jdbc:h2:mem:testdb
+    spring.datasource.driver-class-name=org.h2.Driver
+
+    spring.datasource.hikari.jdbc-url=jdbc:h2:mem:testdb
+
+    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
+    ```
+
+  - 테스트 코드
+
+    ```java
+    @SpringBootTest
+    @AutoConfigureMockMvc
+    @AutoConfigureRestDocs
+    @Import(RestDocsConfiguration.class)
+    @ActiveProfiles("test") // 👌 application-test.porperties 지정
+    public class EventControllerTests {
+
+    }
+    ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
