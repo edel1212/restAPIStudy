@@ -15,6 +15,8 @@ public class IndexController {
     public RepresentationModel index(){
         // 👉 var는 임시 변수로 java 10부터 사용이 가능하다
         var index = new RepresentationModel();
+        // 💬 주의 linkTo() 임포트를 WebFlux를 사용할 경우
+        // Handler dispatch failed: java.lang.NoClassDefFoundError: reactor/util/context/ContextView 에러 발생 주의!
         index.add(linkTo(EventController.class).withRel("events"));
         return index;
     }
