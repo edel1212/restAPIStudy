@@ -17,9 +17,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-//@AutoConfigureRestDocs
-//@Import(RestDocsConfiguration.class)
-//@ActiveProfiles("test")
+@AutoConfigureRestDocs
+@Import(RestDocsConfiguration.class)
+@ActiveProfiles("test")
 public class IndexControllerTests {
     @Autowired
     private MockMvc mockMvc;
