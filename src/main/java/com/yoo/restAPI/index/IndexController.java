@@ -19,5 +19,6 @@ public class IndexController {
         // Handler dispatch failed: java.lang.NoClassDefFoundError: reactor/util/context/ContextView 에러 발생 주의!
         index.add(linkTo(EventController.class).withRel("events"));
         return index;
+      //  return RepresentationModel.of(linkTo(EventController.class).withRel("events"));
     }
 }

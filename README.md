@@ -1059,6 +1059,34 @@ bootJar {
     }
     ```
 
+## Index 응답 만들기
+
+- 첫 목록 페이지라 생각하자
+- 주의사항
+  - `RepresentationModel`객체를 생성하여 사용하자
+    - `RepresentationModel.of()`로 반환할 경우 원하던 응답이 나오지 않음 ❌
+      - 예상했던 값 : `Body = {"_links":{"events":{"href":"http://localhost:8080/api/events"}}}`
+      - 하지만 .. : `Body = {"href":"http://localhost:8080/api/events"}`
+  - `linkTo()`메서드는 꼭 ...WebMvcLinkBuilder를 import해서 사용하자
+    - WebFlux를 사용할 경우
+      - `Handler dispatch failed: java.lang.NoClassDefFoundError: reactor/util/context/ContextView` 에러 발생 주의! 👎
+- 사용 예시
+
+  ```java
+  @RestController
+  public class IndexController {
+
+      @GetMapping("/api")
+      public RepresentationModel index(){
+          // 👉 var는 임시 변수로 java 10부터 사용이 가능하다
+          var index = new RepresentationModel();
+          // ✨ linkTo Import 주의!!
+          index.add(linkTo(EventController.class).withRel("events"));
+          return index;
+      }
+  }
+  ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
