@@ -188,7 +188,7 @@ public class EventControllerTests {
                 ;
     }
 
-    //@Test
+    @Test
     @DisplayName("입력 값이 잘못된 경우 에러 발생 체크")
     void createEvent_Bad_Request_Wrong_input() throws Exception{
         EventDTO eventDTO = EventDTO.builder()
@@ -213,9 +213,8 @@ public class EventControllerTests {
                 )
                 .andExpect(status().isBadRequest())
                 .andDo(print())
-                .andExpect(jsonPath("$[0].objectName").exists())
-                .andExpect(jsonPath("$[0].defaultMessage").exists())
-                .andExpect(jsonPath("$[0].code").exists())
+                // 💬 예외 발생 시 페이지가 전이될 index 링크 추가
+                .andExpect(jsonPath("_links.index").exists())
         ;
     }
 
