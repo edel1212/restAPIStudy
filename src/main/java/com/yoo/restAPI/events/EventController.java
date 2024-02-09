@@ -42,14 +42,16 @@ public class EventController {
     public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
         if(errors.hasErrors()){
             EntityModel<Errors> errorModel = EntityModel.of(errors);
-            errorModel.add(linkTo(methodOn(IndexController.class)).withRel("index"));
+            errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
             return ResponseEntity.badRequest().body(errorModel);
         }
 
         eventValidator.validate(eventDTO, errors);
 
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            EntityModel<Errors> errorModel = EntityModel.of(errors);
+            errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
+            return ResponseEntity.badRequest().body(errorModel);
         }
 
         // 👉 modelMapper를 통해 DTO -> Entity 시킴
