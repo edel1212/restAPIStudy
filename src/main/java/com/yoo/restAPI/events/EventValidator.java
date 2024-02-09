@@ -15,7 +15,7 @@ public class EventValidator {
             errors.rejectValue("maxPrice", "wrongValue", "MaxPrice is wrong");
 
             // 👉 글로벌 에러
-            errors.reject("글로벌 에러입니다.");
+            errors.reject("globalError");
         }
 
         LocalDateTime eventEndTime =  eventDTO.getEndEventDateTime();

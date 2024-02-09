@@ -1,5 +1,6 @@
 package com.yoo.restAPI.events;
 
+import com.yoo.restAPI.index.IndexController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -21,6 +22,7 @@ import java.net.URI;
 
 // ⭐ WebMvcLinkBuilder를 import 해줘야한다 .. 삽질함..
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 //import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo; ❌ 이거 아님 ...
 
 @Controller
@@ -39,7 +41,9 @@ public class EventController {
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            EntityModel<Errors> errorModel = EntityModel.of(errors);
+            errorModel.add(linkTo(methodOn(IndexController.class)).withRel("index"));
+            return ResponseEntity.badRequest().body(errorModel);
         }
 
         eventValidator.validate(eventDTO, errors);

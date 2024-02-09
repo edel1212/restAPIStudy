@@ -23,8 +23,8 @@ public class ErrorSerializer extends JsonSerializer<Errors> {
         errors.getFieldErrors().forEach(err ->{
             try {
                 gen.writeStartObject();
-                gen.writeStringField("여기에 필드명",err.getField());
-                gen.writeStringField("?? 원하는걸 넣어",err.getDefaultMessage());
+                gen.writeStringField("field",err.getField());
+                gen.writeStringField("message",err.getDefaultMessage());
                 gen.writeEndObject();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -35,7 +35,7 @@ public class ErrorSerializer extends JsonSerializer<Errors> {
         errors.getGlobalErrors().forEach(err ->{
             try {
                 gen.writeStartObject();
-                gen.writeStringField("?? 원하는걸 넣어",err.getDefaultMessage());
+                gen.writeStringField("wantMsg",err.getDefaultMessage());
                 gen.writeEndObject();
             } catch (IOException e) {
                 throw new RuntimeException(e);
