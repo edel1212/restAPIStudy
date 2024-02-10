@@ -41,22 +41,16 @@ public class EventController {
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
         if(errors.hasErrors()){
-            ErrorDTO errorDTO = ErrorDTO.builder()
-                    .field("fileName").status(999).message("Error!!").build();
-            EntityModel<ErrorDTO> errorModel = EntityModel.of(errorDTO);
-            errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
+            EntityModel<ErrorDTO> errorModel = this.makeErrorDTO(errors);
             return ResponseEntity.badRequest().body(errorModel);
-        }
+        }// if
 
         eventValidator.validate(eventDTO, errors);
 
         if(errors.hasErrors()){
-            ErrorDTO errorDTO = ErrorDTO.builder()
-                    .field("fileName").status(999).message("Error!!").build();
-            EntityModel<ErrorDTO> errorModel = EntityModel.of(errorDTO);
-            errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
+            EntityModel<ErrorDTO> errorModel = this.makeErrorDTO(errors);
             return ResponseEntity.badRequest().body(errorModel);
-        }
+        }// if
 
         // 👉 modelMapper를 통해 DTO -> Entity 시킴
         Event event = modelMapper.map(eventDTO, Event.class);
@@ -83,4 +77,14 @@ public class EventController {
         return ResponseEntity.created(createdUri).body(eventEntityModel);
     }
 
+    private EntityModel<ErrorDTO> makeErrorDTO(Errors errors){
+        ErrorDTO errorDTO = ErrorDTO.builder().status(999).build();
+        errors.getFieldErrors().forEach(item->{
+            errorDTO.setField(item.getField());
+            errorDTO.setMessage(item.getDefaultMessage());
+        });
+        EntityModel<ErrorDTO> errorModel = EntityModel.of(errorDTO);
+        errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
+        return  errorModel;
+    }
 }

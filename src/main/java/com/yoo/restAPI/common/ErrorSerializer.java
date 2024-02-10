@@ -13,7 +13,7 @@ import java.io.IOException;
  * SpringBean JSON에서  자동으로 JSON으로 만들어주지 않는다.
  * - 그럴 경우 아래와 같이 상속을 통해 만들어 줄 수 있음
  * */
-@JsonComponent // 👉 해당 어노테이션을 사용하면 쉽게 등록 가능함 따로 불러서 사용할 필요도 없다
+//@JsonComponent // 👉 해당 어노테이션을 사용하면 쉽게 등록 가능함 따로 불러서 사용할 필요도 없다
 public class ErrorSerializer extends JsonSerializer<Errors> {
     @Override
     public void serialize(Errors errors, JsonGenerator gen, SerializerProvider serializers) throws IOException {
