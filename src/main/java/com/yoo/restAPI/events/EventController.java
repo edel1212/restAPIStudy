@@ -41,7 +41,9 @@ public class EventController {
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
         if(errors.hasErrors()){
-            EntityModel<Errors> errorModel = EntityModel.of(errors);
+            ErrorDTO errorDTO = ErrorDTO.builder()
+                    .field("fileName").status(999).message("Error!!").build();
+            EntityModel<ErrorDTO> errorModel = EntityModel.of(errorDTO);
             errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
             return ResponseEntity.badRequest().body(errorModel);
         }
@@ -49,7 +51,9 @@ public class EventController {
         eventValidator.validate(eventDTO, errors);
 
         if(errors.hasErrors()){
-            EntityModel<Errors> errorModel = EntityModel.of(errors);
+            ErrorDTO errorDTO = ErrorDTO.builder()
+                    .field("fileName").status(999).message("Error!!").build();
+            EntityModel<ErrorDTO> errorModel = EntityModel.of(errorDTO);
             errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
             return ResponseEntity.badRequest().body(errorModel);
         }
