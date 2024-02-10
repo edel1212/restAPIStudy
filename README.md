@@ -1087,6 +1087,40 @@ bootJar {
   }
   ```
 
+### Error 발생 시 처리
+
+- Index페이지를 만든 이유는 바로 Error를 처리하기 위함이 크다.
+  - 에러가 발생하면 전체 API사용 목록을 볼 수 있게 끔 보여주기 위함이다.
+- 이슈 사항
+  - 최초에 작성했던 `JsonSerializer`를 이용한 Errors를 Json화 하는 부분에서 해당 만들어 진 객체를 `EntityModel`로 변환하는
+    이슈가 발생
+    - Custom DTO를 만들어서 Error를 컨트롤함.
+  - ⭐️ 따로 필요 없이 받아온 Error 예외들을 `getFieldErrors()` 혹은 `getFieldError()`를 통해 처리 해주자
+- 예시
+
+  ```java
+  @PostMapping
+    public ResponseEntity createEvent(@RequestBody @Valid EventDTO eventDTO, Errors errors){
+        //  값 검증
+        eventValidator.validate(eventDTO, errors);
+        //  👉 예외 발생 시 처리
+        if(errors.hasErrors()){
+            ErrorDTO errorDTO = ErrorDTO.builder()
+                    .field("fileName").status(999).message("Error!!").build();
+            EntityModel<ErrorDTO> errorModel = EntityModel.of(errorDTO);
+            errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
+            return ResponseEntity.badRequest().body(errorModel);
+        } // if
+
+        Event event = modelMapper.map(eventDTO, Event.class);
+        event.update();
+        // 저장
+        Event newEvent =  this.eventRepository.save(event);
+        EntityModel<Event> eventEntityModel = EntityModel.of(newEvent);
+        return ResponseEntity.created(createdUri).body(eventEntityModel);
+    }
+  ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
