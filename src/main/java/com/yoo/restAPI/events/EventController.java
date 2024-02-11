@@ -78,13 +78,16 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler pagedResourcesAssembler){
+    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler assembler){
+        // 💬 페이지만 반환할 경우 목록만 표출
         Page<Event> page = this.eventRepository.findAll(pageable);
-        var pagedResources  = pagedResourcesAssembler.toModel(page,entity ->{
+        // ⭐️ PagedResourcesAssembler를 사용하면 시작, 끝 등 _link정보가 자동으로 주입된다.
+        var pagedResources  = assembler.toModel(page,entity ->{
             EntityModel<Event> entityModel = EntityModel.of((Event) entity);
             entityModel.add(linkTo(EventController.class).slash(((Event) entity).getId()).withSelfRel());
             return entityModel;
         } );
+        // 💬 profile 추가
         pagedResources.add(Link.of("/docs/index.html#resources-query-events").withRel("profile"));
         return ResponseEntity.ok(pagedResources);
     }
