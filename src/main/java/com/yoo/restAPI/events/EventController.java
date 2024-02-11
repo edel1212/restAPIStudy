@@ -85,6 +85,7 @@ public class EventController {
             entityModel.add(linkTo(EventController.class).slash(((Event) entity).getId()).withSelfRel());
             return entityModel;
         } );
+        pagedResources.add(Link.of("/docs/index.html#resources-query-events").withRel("profile"));
         return ResponseEntity.ok(pagedResources);
     }
 

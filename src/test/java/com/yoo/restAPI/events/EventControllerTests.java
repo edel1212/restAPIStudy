@@ -19,6 +19,7 @@ import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.swing.text.Document;
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
 
@@ -224,7 +225,10 @@ public class EventControllerTests {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("page").exists())
-
+                .andExpect(jsonPath("_embedded.eventList[*]._links.self").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("query-events"))
         ;
     }
 
