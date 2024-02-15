@@ -14,12 +14,10 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -88,8 +86,19 @@ public class EventController {
             return entityModel;
         } );
         // 💬 profile 추가
-        pagedResources.add(Link.of("/docs/index.html#resources-query-events").withRel("profile"));
+        pagedResources.add(Link.of("/docs/index.html#query-events").withRel("profile"));
         return ResponseEntity.ok(pagedResources);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity getEvent(@PathVariable Integer id){
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if(optionalEvent.isEmpty()) return ResponseEntity.notFound().build();
+
+        EntityModel<Event> entityModel = EntityModel.of(optionalEvent.get());
+        entityModel.add(linkTo(methodOn(EventController.class).getEvent(id)).withSelfRel());
+        entityModel.add(Link.of("/docs/index.html#get-events").withRel("profile"));
+        return ResponseEntity.ok(entityModel);
     }
 
     private EntityModel<ErrorDTO> makeErrorDTO(Errors errors){
