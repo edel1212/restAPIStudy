@@ -232,12 +232,30 @@ public class EventControllerTests {
         ;
     }
 
-    private void generateEvent(int index) {
+    @Test
+    @DisplayName("기존의 이벤트를 하나 조회하기")
+    void getEvent() throws Exception{
+        // Given
+        Event event = this.generateEvent(100);
+
+        // When
+        this.mockMvc.perform(get("/api/events/{id}",event.getId()))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(print())
+                ;
+    }
+
+    private Event generateEvent(int index) {
         Event event = Event.builder()
                 .name("event"+ index)
                 .name("description"+ index)
                 .build();
-        eventRepository.save(event);
+        return eventRepository.save(event);
     }
 
 
