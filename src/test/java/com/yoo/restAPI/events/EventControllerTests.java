@@ -250,6 +250,24 @@ public class EventControllerTests {
                 ;
     }
 
+    @Test
+    @DisplayName("없는 이벤트 단건 조회 시 404 반환")
+    void getEven404() throws Exception{
+        // Given
+        Event event = this.generateEvent(100);
+
+        // When
+        this.mockMvc.perform(get("/api/events/{id}",event.getId()))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(print())
+        ;
+    }
+
     private Event generateEvent(int index) {
         Event event = Event.builder()
                 .name("event"+ index)
