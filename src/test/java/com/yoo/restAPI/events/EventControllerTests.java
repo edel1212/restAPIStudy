@@ -292,7 +292,10 @@ public class EventControllerTests {
                 .andExpect(jsonPath("name").value(eventName))
                 // 👉 Link를 가지는지 체크
                 .andExpect(jsonPath("_links.self").exists())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("update-event"))
+
+        ;
     }
 
     @Test
