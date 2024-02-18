@@ -19,7 +19,6 @@ import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.swing.text.Document;
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
 
@@ -27,9 +26,9 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -262,6 +261,30 @@ public class EventControllerTests {
                 // Then
                 .andExpect(status().isNotFound())
         ;
+    }
+
+    @Test
+    @DisplayName("수정 테스트")
+    void getFixEvents() throws Exception{
+        // Given
+        Event event =this.generateEvent(999);
+        EventDTO eventDTO = EventDTO.builder()
+                .description("수정했습니다!! 그것도 방금!!")
+                .build();
+
+        /** Put, Patch 차이
+         * - Put : 자원의 전체 교체 / 해당 리소스가 없으면 새롭게 생성
+         * - Patch :    자원의 부분 교체
+         *  */
+        // When
+        this.mockMvc.perform(patch("/apu/events/"+event.getId())
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaTypes.HAL_JSON_VALUE)
+                .content(this.objectMapper.writeValueAsString(eventDTO)))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value("수정했습니다!! 그것도 방금!!"))
+                .andDo(print());
     }
 
     private Event generateEvent(int index) {
