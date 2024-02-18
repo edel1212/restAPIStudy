@@ -104,20 +104,29 @@ public class EventController {
         return ResponseEntity.ok(entityModel);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody EventDTO eventDTO){
+    @PatchMapping("/{id}")
+    public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody @Valid EventDTO eventDTO,
+                                      Errors errors){
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        // 👉 ID가 존재하지 않을 경우
         if(optionalEvent.isEmpty()) return ResponseEntity.notFound().build();
 
-        Event event = optionalEvent.get();
-        // 받아온 후 Param을 추가 해주거나 변환 메서드를 구현해주자
-        event.setName(eventDTO.getName());
-        log.info("=================");
-        log.info(eventDTO);
-        log.info("=================");
+        // 👉 잘못된 값일 경우
+        eventValidator.validate(eventDTO, errors);
+        if(errors.hasErrors()) {
+            EntityModel<ErrorDTO> errorModel = this.makeErrorDTO(errors);
+            return ResponseEntity.badRequest().body(errorModel);
+        }// if
 
-        EntityModel<Event> entityModel = EntityModel.of(event);
-        entityModel.add(linkTo(methodOn(EventController.class).updateEvent(id, eventDTO)).withSelfRel());
+        // 1. Entity 데이터를 가져옴
+        Event exsistingEvent = optionalEvent.get();
+        // 2. DTO 정보를 exsistingEvent 와 합침! 여기서 ID값은 비어있으므로 select한 값 유지
+        this.modelMapper.map(eventDTO, exsistingEvent);
+        // 3. modify 실행
+        this.eventRepository.save(exsistingEvent);
+
+        EntityModel<Event> entityModel = EntityModel.of(exsistingEvent);
+        entityModel.add(linkTo(methodOn(EventController.class).updateEvent(id, eventDTO, errors)).withSelfRel());
         entityModel.add(Link.of("/docs/index.html#mdofify-events").withRel("profile"));
         return ResponseEntity.ok(entityModel);
     }

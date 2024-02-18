@@ -272,17 +272,16 @@ public class EventControllerTests {
     void updateEvent() throws Exception{
         // Given
         Event event =this.generateEvent(999);
+        EventDTO eventDTO = this.modelMapper.map(event, EventDTO.class);
         String eventName = "Update Event";
-        EventDTO eventDTO = EventDTO.builder()
-                .name(eventName)
-                .build();
+        eventDTO.setName(eventName);
 
         /** Put, Patch 차이
          * - Put : 자원의 전체 교체 / 해당 리소스가 없으면 새롭게 생성
          * - Patch :    자원의 부분 교체
          *  */
         // When
-        this.mockMvc.perform(put("/api/events/{id}",event.getId())
+        this.mockMvc.perform(patch("/api/events/{id}",event.getId())
                         // ☠️ 삽질함..  contentType, content 둘 제대로 확인안해서 body값이 계속 null.. 정신차리자
                         // -  content(MediaType.APPLICATION_JSON_VALUE)로 보냄..
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -301,12 +300,11 @@ public class EventControllerTests {
     void updateEvent400_Empty() throws Exception{
         // Given
         Event event =this.generateEvent(999);
-        EventDTO eventDTO = EventDTO.builder().build();
-
+        EventDTO eventDTO = null;
 
         // When
         this.mockMvc.perform(patch("/api/events/{id}",event.getId())
-                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaTypes.HAL_JSON_VALUE)
                         .content(this.objectMapper.writeValueAsBytes(eventDTO)))
                 // Then
@@ -326,7 +324,7 @@ public class EventControllerTests {
 
         // When
         this.mockMvc.perform(patch("/api/events/{id}",event.getId())
-                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaTypes.HAL_JSON_VALUE)
                         .content(this.objectMapper.writeValueAsBytes(eventDTO)))
                 // Then
@@ -342,8 +340,8 @@ public class EventControllerTests {
                 .description("수정했습니다!! 그것도 방금!!")
                 .build();
 
-        this.mockMvc.perform(patch("/api/events/999999999999999999")
-                        .content(MediaType.APPLICATION_JSON_VALUE)
+        this.mockMvc.perform(patch("/api/events/9999")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaTypes.HAL_JSON_VALUE)
                         .content(this.objectMapper.writeValueAsString(eventDTO)))
                 // Then
