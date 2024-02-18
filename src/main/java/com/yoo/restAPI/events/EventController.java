@@ -3,6 +3,7 @@ package com.yoo.restAPI.events;
 import com.yoo.restAPI.index.IndexController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -27,6 +29,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequiredArgsConstructor
 // ⭐ RequestMapping을 사용해서 produces를 지정하면 하위 모든 Method의 반환 타입을 지정 가능하다!
 @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE )
+@Log4j2
 public class EventController {
 
     private final EventRepository eventRepository;
@@ -90,7 +93,7 @@ public class EventController {
         return ResponseEntity.ok(pagedResources);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity getEvent(@PathVariable Integer id){
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
         if(optionalEvent.isEmpty()) return ResponseEntity.notFound().build();
@@ -98,6 +101,24 @@ public class EventController {
         EntityModel<Event> entityModel = EntityModel.of(optionalEvent.get());
         entityModel.add(linkTo(methodOn(EventController.class).getEvent(id)).withSelfRel());
         entityModel.add(Link.of("/docs/index.html#get-events").withRel("profile"));
+        return ResponseEntity.ok(entityModel);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody EventDTO eventDTO){
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if(optionalEvent.isEmpty()) return ResponseEntity.notFound().build();
+
+        Event event = optionalEvent.get();
+        // 받아온 후 Param을 추가 해주거나 변환 메서드를 구현해주자
+        event.setName(eventDTO.getName());
+        log.info("=================");
+        log.info(eventDTO);
+        log.info("=================");
+
+        EntityModel<Event> entityModel = EntityModel.of(event);
+        entityModel.add(linkTo(methodOn(EventController.class).updateEvent(id, eventDTO)).withSelfRel());
+        entityModel.add(Link.of("/docs/index.html#mdofify-events").withRel("profile"));
         return ResponseEntity.ok(entityModel);
     }
 

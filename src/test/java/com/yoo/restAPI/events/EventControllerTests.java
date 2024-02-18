@@ -7,6 +7,7 @@ import com.yoo.restAPI.common.RestDocsConfiguration;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -54,6 +55,9 @@ public class EventControllerTests {
 
     @Autowired
    private EventRepository eventRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Test
     @DisplayName("입력 값이 잘못된 경우 에러 발생 체크")
@@ -264,12 +268,13 @@ public class EventControllerTests {
     }
 
     @Test
-    @DisplayName("수정 테스트")
-    void getFixEvents() throws Exception{
+    @DisplayName("이벤트를 정상적으로 수정하기")
+    void updateEvent() throws Exception{
         // Given
         Event event =this.generateEvent(999);
+        String eventName = "Update Event";
         EventDTO eventDTO = EventDTO.builder()
-                .description("수정했습니다!! 그것도 방금!!")
+                .name(eventName)
                 .build();
 
         /** Put, Patch 차이
@@ -277,21 +282,92 @@ public class EventControllerTests {
          * - Patch :    자원의 부분 교체
          *  */
         // When
-        this.mockMvc.perform(patch("/apu/events/"+event.getId())
-                        .content(MediaType.APPLICATION_JSON_VALUE)
+        this.mockMvc.perform(put("/api/events/{id}",event.getId())
+                        // ☠️ 삽질함..  contentType, content 둘 제대로 확인안해서 body값이 계속 null.. 정신차리자
+                        // -  content(MediaType.APPLICATION_JSON_VALUE)로 보냄..
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaTypes.HAL_JSON_VALUE)
-                .content(this.objectMapper.writeValueAsString(eventDTO)))
+                        .content(this.objectMapper.writeValueAsString(eventDTO)))
                 // Then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("description").value("수정했습니다!! 그것도 방금!!"))
+                .andExpect(jsonPath("name").value(eventName))
+                // 👉 Link를 가지는지 체크
+                .andExpect(jsonPath("_links.self").exists())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("입력값이 비어있는 경우 이벤트 수정 실패")
+    void updateEvent400_Empty() throws Exception{
+        // Given
+        Event event =this.generateEvent(999);
+        EventDTO eventDTO = EventDTO.builder().build();
+
+
+        // When
+        this.mockMvc.perform(patch("/api/events/{id}",event.getId())
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaTypes.HAL_JSON_VALUE)
+                        .content(this.objectMapper.writeValueAsBytes(eventDTO)))
+                // Then
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("입력값이 잘못된 경우 이벤트 수정 실패")
+    void updateEvent400_Wrong() throws Exception{
+        // Given
+        Event event =this.generateEvent(999);
+        EventDTO eventDTO = this.modelMapper.map(event, EventDTO.class);
+        // ❌ BasePrice가 Max보다 훨신 높음
+        eventDTO.setBasePrice(9_999_999);
+        eventDTO.setMaxPrice(10);
+
+        // When
+        this.mockMvc.perform(patch("/api/events/{id}",event.getId())
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaTypes.HAL_JSON_VALUE)
+                        .content(this.objectMapper.writeValueAsBytes(eventDTO)))
+                // Then
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 아이디로 업데이트 요청 실패")
+    void updateEvent404() throws Exception{
+        // Given
+        EventDTO eventDTO = EventDTO.builder()
+                .description("수정했습니다!! 그것도 방금!!")
+                .build();
+
+        this.mockMvc.perform(patch("/api/events/999999999999999999")
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaTypes.HAL_JSON_VALUE)
+                        .content(this.objectMapper.writeValueAsString(eventDTO)))
+                // Then
+                .andExpect(status().isNotFound())
                 .andDo(print());
     }
 
     private Event generateEvent(int index) {
         Event event = Event.builder()
-                .name("event"+ index)
-                .name("description"+ index)
+                .name("Spring")
+                .description("Rest API Test")
+                .beginEnrollmentDateTime(LocalDateTime.now())
+                .closeEnrollmentDateTime(LocalDateTime.now().plusDays(10))
+                .beginEventDateTime(LocalDateTime.now())
+                .endEventDateTime(LocalDateTime.now().plusDays(10))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("공릉역")
+                .free(false)
+                .offline(false)
+                .eventStatus(EventStatus.DRAFT)
                 .build();
+
         return eventRepository.save(event);
     }
 
