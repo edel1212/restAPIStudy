@@ -3,6 +3,7 @@ package com.yoo.restAPI.events;
 //import org.junit.Test; ❌ Junit4버전
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yoo.restAPI.common.BaseControllerTests;
 import com.yoo.restAPI.common.RestDocsConfiguration;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -33,31 +34,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs // 1 해당 어노테이션을 선언해서 사용한다 지정
-@Import(RestDocsConfiguration.class)    // 💬 Docs 형식 pretty
-@ActiveProfiles("test")
-public class EventControllerTests {
 
-    /**
-     * - Spring Mvc 테스트에 있어서 가장 핵심 적인 클래스 이다.
-     * - 웹서버를 띄우지 않기 떄문에 빠르다
-     * - 디스패처서블릿을 만들기 떄문에 단위 테스트보다는 느리다
-     * */
-    @Autowired
-    private MockMvc mockMvc;
-
-
-    // 👉 Spring Boot는 자동으로 Jackson이 의존성주입이 되어이 있음
-    @Autowired
-    private ObjectMapper objectMapper;
-
+public class EventControllerTests extends BaseControllerTests {
     @Autowired
    private EventRepository eventRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Test
     @DisplayName("입력 값이 잘못된 경우 에러 발생 체크")
