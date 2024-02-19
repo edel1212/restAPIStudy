@@ -1,5 +1,6 @@
 package com.yoo.restAPI.events;
 
+import com.yoo.restAPI.accounts.Account;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.util.StringUtils;
@@ -22,7 +23,6 @@ import java.time.LocalDateTime;
  * */
 @EqualsAndHashCode( of = "id")
 @Entity
-// @Data  <<가 있지만 Entity에서는 사용하지말자 위에서 말한 EqualsAndHashCode를 모든 필드를 대상으로 만들기 떄문이다.
 public class Event {
     // 식별자
     @Id @GeneratedValue
@@ -54,6 +54,8 @@ public class Event {
     // (optional)
     private int maxPrice;
     private int limitOfEnrollment;
+    @ManyToOne
+    private Account manager;
 
     public void update() {
         // Update Free
