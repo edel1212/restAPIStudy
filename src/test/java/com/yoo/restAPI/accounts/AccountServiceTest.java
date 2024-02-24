@@ -40,9 +40,14 @@ class AccountServiceTest {
         // 2 . loadUserByUsername()를 통해 UserDetails를 가져옴
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        //Then
 
+        //Then
+        System.out.println("-----------");
+        System.out.println(password);
+        System.out.println(userDetails.getPassword());
+        System.out.println("-----------");
         assertThat(userDetails.getPassword()).isEqualTo(password);
+
 
     }
 }
