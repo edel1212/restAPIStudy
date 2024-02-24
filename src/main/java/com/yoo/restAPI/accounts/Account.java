@@ -2,6 +2,7 @@ package com.yoo.restAPI.accounts;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Set;
 
