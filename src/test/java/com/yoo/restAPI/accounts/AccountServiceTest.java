@@ -1,15 +1,18 @@
 package com.yoo.restAPI.accounts;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -25,7 +28,7 @@ class AccountServiceTest {
     void findByUserName() {
         //Given
         String password = "123";
-        String username = "keesum@email.com";
+        String username = "edel1212@naver.com";
         Account account = Account.builder()
                 .email(username)
                 .password(password)
@@ -48,6 +51,19 @@ class AccountServiceTest {
         System.out.println("-----------");
         assertThat(userDetails.getPassword()).isEqualTo(password);
 
+    }
+
+    @Test
+    @DisplayName("유저를 찾을 수 없는 에러")
+    void findByUserNameFail() {
+        String username = "unknown";
+        try {
+            accountService.loadUserByUsername(username);
+            fail("supposed to be failed");
+        }  catch (UsernameNotFoundException e){
+            // 에러 메세지에 유저네임이 있는지 확인
+            assertThat(e.getMessage()).contains(username);
+        }// try - catch
 
     }
 }
