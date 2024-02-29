@@ -12,10 +12,6 @@ public class RestApiApplication {
 		SpringApplication.run(RestApiApplication.class, args);
 	}
 
-	/** Dependencies에 추가한 ModelMapper를 빈으로 추가 */
-	@Bean
-	public ModelMapper modelMapper(){
-		return new ModelMapper();
-	}
+
 
 }
