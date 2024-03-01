@@ -1,20 +1,20 @@
 package com.yoo.restAPI.config;
 
-import com.yoo.restAPI.accounts.AccountService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@RequiredArgsConstructor
-@EnableWebSecurity // 👉 설정 순간부터 Security 설정은 작성 기준으로 변경된다
-public class SecurityConfig  extends WebSecurityConfiguration {
+@Log4j2
+public class SecurityConfig {
 
-    private final AccountService accountService;
-    private final PasswordEncoder passwordEncoder;
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        log.info("Hi!!");
+        return http.build();
+    }
+
 
 }
