@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration
+//@Configuration
 @Log4j2
 public class SecurityConfig {
 
@@ -19,6 +19,9 @@ public class SecurityConfig {
         log.info("-------------------------");
         return http.build();
     }
+
+
+
 
     // Security에서 검사 대상 제외 추가
     @Bean

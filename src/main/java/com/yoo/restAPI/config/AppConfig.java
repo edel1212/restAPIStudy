@@ -13,6 +13,7 @@ public class AppConfig {
         return new ModelMapper();
     }
 
+    // 페스워드 인코더 설정
     @Bean
     public PasswordEncoder passwordEncoder(){
         // ✨ 패스워드 앞에 prefix를 추가하여 생성해준다
