@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Set;
@@ -24,18 +25,21 @@ class AccountServiceTest {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Test
     void findByUserName() {
         //Given
         String password = "123";
-        String username = "edel1212@naver.com";
+        String username = "iopjkl1212@naver.com";
         Account account = Account.builder()
                 .email(username)
                 .password(password)
                 .roles(Set.of(AccountRole.USER,AccountRole.ADMIN))
                 .build();
         // 👉 저장
-        accountRepository.save(account);
+        accountService.registerAccount(account);
 
         //When
         // 1 . UserDetailsService를 구현한 구현체 클래스를 가져옴
@@ -49,7 +53,8 @@ class AccountServiceTest {
         System.out.println(password);
         System.out.println(userDetails.getPassword());
         System.out.println("-----------");
-        assertThat(userDetails.getPassword()).isEqualTo(password);
+        // 👉 matches를 사용해서 비밀번호 매칭 ( 입력값, 매칭값 )
+        assertThat( this.passwordEncoder.matches(password , userDetails.getPassword()) );
 
     }
 
