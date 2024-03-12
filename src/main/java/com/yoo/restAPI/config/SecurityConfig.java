@@ -4,19 +4,28 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 
-//@Configuration
+@Configuration
 @Log4j2
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+
         log.info("-------------------------");
         log.info("Filter Chain");
         log.info("-------------------------");
+        http.authorizeHttpRequests( authorize ->
+                authorize.requestMatchers("/**").hasRole("ADMIN")
+                        .anyRequest().authenticated() // 모든 요청은 인증되어야 함
+                );
+
+        //http.formLogin(au->au.loginPage("/login").permitAll());
+
         return http.build();
     }
 
