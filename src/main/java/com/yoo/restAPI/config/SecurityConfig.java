@@ -24,8 +24,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated() // 모든 요청은 인증되어야 함
                 );
 
-        //http.formLogin(au->au.loginPage("/login").permitAll());
-
         return http.build();
     }
 
