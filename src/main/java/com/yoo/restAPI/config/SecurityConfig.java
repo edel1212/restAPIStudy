@@ -19,6 +19,10 @@ public class SecurityConfig {
         log.info("-------------------------");
         log.info("Filter Chain");
         log.info("-------------------------");
+
+        // 👉  Default Login form 설정
+        http.formLogin(Customizer.withDefaults());
+
         http.authorizeHttpRequests( authorize ->
                 authorize.requestMatchers("/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // 모든 요청은 인증되어야 함
