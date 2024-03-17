@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -23,9 +24,13 @@ public class SecurityConfig {
         // 👉  Default Login form 설정
         http.formLogin(Customizer.withDefaults());
 
+        // 👉 권한 별 접근 허용 설정
         http.authorizeHttpRequests( authorize ->
-                authorize.requestMatchers("/**").hasRole("ADMIN")
-                        .anyRequest().authenticated() // 모든 요청은 인증되어야 함
+                // ✨ GET 요청은 누구나 접근 가능
+                authorize.requestMatchers(HttpMethod.GET, "/api/**")
+                        .anonymous()   // 누구나 접근 가능
+                        //.authenticated() // 인증된 사용자만 접근 가능
+                        .anyRequest().authenticated()
                 );
 
         return http.build();
