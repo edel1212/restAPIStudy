@@ -48,6 +48,11 @@ dependencies {
 	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	// security 변경
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Security 테스트
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
+	testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '6.2.2'
+
 }
 
 tasks.named('bootBuildImage') {
