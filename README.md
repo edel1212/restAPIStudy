@@ -1221,3 +1221,21 @@ bootJar {
     - `perform.andRedurn().getResponse().getContentAsString()`으로 문자열로 반환
       - `var parser = new Jackson2JsonParser();` 객체 생성
         - `parser.parseMap(변환 문자열).get(키 값).toString()`으로 변환이 가능하다
+- SpringSecurity에서 승인된 요청에서 인증 보를 받는 방법
+  - 1 . 코드 내 직접 `SecurityContextHolder`에 접근하여 받아온다
+    - `SecurityContextHolder.getContext().getAuthentication();`을 통해 받아올 수 있다.
+  - 2 . SpringSecurity에서 제공하는 어노테이션을 통해 받아온다.
+    - `@AuthenticationPrincipal User상속Class 객체`
+      - 해당 방법이 객체를 바로 주입 받을 수 있어 코드가 더 간결해 진다.
+    - `@AuthenticationPrincipal(experssion = "대상") 대상 객체`
+      - 위와 같이 `experssion`를 활용하면 코드가 더욱 간결해 진다.
+    - AnnotationClass를 사용해서 더욱 간소화 가능
+      - `@AuthenticationPrincipal`는 메타 어노테이션을 지원하므로 간소화 가능
+        ```java
+        @Target(ElementType.PARAMETER)      // 파라미터 형태로 사용 명시
+        @Retention(RetentionPolicy.RUNTIME) // 언제까지 해당 어노테이션 지정 여부 : 런타임
+        @AuthenticationPrincipal(expression = "targetKey")
+        public @interface CurrentUser {
+        }
+      ```
+    - `@AuthenticationPrincipal(experssion = "대상") 대상 객체` -> `@CurrentUser 대상 객체` 간소화
