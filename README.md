@@ -1147,6 +1147,54 @@ bootJar {
   }
   ```
 
+## 내부문자열을 외부설정으로 빼기
+- 코드 내 작성되어 있던 문자열을 `properties`로 빼낸 후 Class에 매핑하여 사용
+  - 가독성이 좋아지며 한번에 관리하기도 좋아진다. 
+
+- ### dependencies
+  ```groovy
+  dependencies {
+      // application 설정을 Java에 매핑
+      annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  }
+  ```
+- ### MappingClass
+  - `prefix` 설정을 하면 시작명으로 잡을 수 있다.
+  ```java
+  @Component
+  @ConfigurationProperties("my-app")
+  @Getter
+  @Setter
+  public class AppProperties {
+      @NotNull
+      private String username;
+      @NotNull
+      private String password;
+  }
+  ```
+
+- ### application.properties
+  ```properties
+  my-app.username = "edel1212"
+  my-app.password = "123"
+  ```
+
+- ### 테스트
+  ```java
+  @SpringBootTest
+  public class AppPropertiesTests {
+  
+      @Autowired
+      private AppProperties properties;
+  
+      @Test
+      void name() {
+          System.out.println("userName  :: " + properties.getUsername());
+          System.out.println("userPassword  :: " + properties.getPassword());
+      }
+  }
+  ```
+
 ## 유용한 intellij 단축키
 
 - `커맨드 + 쉬프트 + t` : 사용 클래스에서의 테스트 코드 생성 및 이동이 가능함
@@ -1167,6 +1215,7 @@ bootJar {
 - 테스트 코드 작성 시 `H2-Base`를 사용한 `In-Memory DB`를 사용한다 해도 다건의 테스트의 경우 데이터가 공유 된다.
   - 해당 이슈를 해결 하기 위해서는 만약 어쩔 수 없는 공유된 데이터의 경우 `@Before`어노테이션을 활용해서 지워주자
     - Ex) 인증 정보 추가 시 계정이 계속해서 같은 ID가 추가되는 문제가 발생
+  - 해당 문제는 `@Before`을 사용하지 않더라도 중복 요청이 발생하지 않도록 로직 내에서 처리하는 방식으로도 가능하다.
 - `MockMvc`테스트에서 결과값을 받아서 Return 받기
   - `ResultActions`로 해당 테스트의 `perform()`결과를 받아올 수 있다.
     - `perform.andRedurn().getResponse().getContentAsString()`으로 문자열로 반환
