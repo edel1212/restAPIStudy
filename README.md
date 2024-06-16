@@ -1231,11 +1231,15 @@ bootJar {
       - 위와 같이 `experssion`를 활용하면 코드가 더욱 간결해 진다.
     - AnnotationClass를 사용해서 더욱 간소화 가능
       - `@AuthenticationPrincipal`는 메타 어노테이션을 지원하므로 간소화 가능
-        ```java
-        @Target(ElementType.PARAMETER)      // 파라미터 형태로 사용 명시
-        @Retention(RetentionPolicy.RUNTIME) // 언제까지 해당 어노테이션 지정 여부 : 런타임
-        @AuthenticationPrincipal(expression = "targetKey")
-        public @interface CurrentUser {
-        }
+      ```java
+      @Target(ElementType.PARAMETER)      // 파라미터 형태로 사용 명시
+      @Retention(RetentionPolicy.RUNTIME) // 언제까지 해당 어노테이션 지정 여부 : 런타임
+      // @AuthenticationPrincipal(expression = "targetKey")
+      /**
+      * ✅ 접근 대상이 anonymousUser 권한이 들어올 경우 User 객체를 타고 넘어오지 않아 응답 값이
+      *    anonymousUser라는 문자열로 들어오기에 해당 expression의 유연함을 활용해서 적용해주자
+      * */
+      @AuthenticationPrincipal(expression = "#this == 'anonymousUser' ? null : targetKey")
+      public @interface CurrentUser { }
       ```
     - `@AuthenticationPrincipal(experssion = "대상") 대상 객체` -> `@CurrentUser 대상 객체` 간소화
