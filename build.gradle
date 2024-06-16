@@ -48,7 +48,8 @@ dependencies {
 	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	// security 변경
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-
+	// application 설정을 Java에 매핑
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 }
 
 tasks.named('bootBuildImage') {
