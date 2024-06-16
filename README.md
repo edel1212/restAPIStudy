@@ -1160,3 +1160,15 @@ bootJar {
 
 - `@JsonUnwrapped`를 사용하면 직렬화(Object Mapper가 Serializer 시) 해당 부분을 **꺼낸 후** JSON으로 만듬
 - 직렬화를 할때 Java Bean스팩에 맞게 직렬화를 한다.
+
+
+
+## 개발 시 참고 사항
+- 테스트 코드 작성 시 `H2-Base`를 사용한 `In-Memory DB`를 사용한다 해도 다건의 테스트의 경우 데이터가 공유 된다.
+  - 해당 이슈를 해결 하기 위해서는 만약 어쩔 수 없는 공유된 데이터의 경우 `@Before`어노테이션을 활용해서 지워주자
+    - Ex) 인증 정보 추가 시 계정이 계속해서 같은 ID가 추가되는 문제가 발생
+- `MockMvc`테스트에서 결과값을 받아서 Return 받기
+  - `ResultActions`로 해당 테스트의 `perform()`결과를 받아올 수 있다.
+    - `perform.andRedurn().getResponse().getContentAsString()`으로 문자열로 반환
+      - `var parser = new Jackson2JsonParser();` 객체 생성
+        - `parser.parseMap(변환 문자열).get(키 값).toString()`으로 변환이 가능하다
