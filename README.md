@@ -1247,3 +1247,6 @@ bootJar {
   ```properties
   spring.output.ansi.enabled=always
   ```
+- P6psy
+    - SpringBoot 3.x.x 버전 이상부터는 적용 Dependecies 버전이 올라감
+    	-   `implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'`
