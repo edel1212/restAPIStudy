@@ -1243,3 +1243,7 @@ bootJar {
       public @interface CurrentUser { }
       ```
     - `@AuthenticationPrincipal(experssion = "대상") 대상 객체` -> `@CurrentUser 대상 객체` 간소화
+- Log 컬러 추가
+  ```properties
+  spring.output.ansi.enabled=always
+  ```
