@@ -1250,3 +1250,16 @@ bootJar {
 - P6psy
     - SpringBoot 3.x.x 버전 이상부터는 적용 Dependecies 버전이 올라감
     	-   `implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'`
+- 테스트 코드 응답 값 한글 처리
+  - 테스트 코드 작성 후 응답 결과가 한글이 깨지는 이슈 발생
+  - ctx를 주입하여 한글 설정을 해서 해결하는 듯 했으나 Security의 경우 `apply(security())`를 통해 이슈를 제거했으나 `@AutoConfigureRestDocs`에서 이슈 발생
+  	- Error Log :  `REST Docs configuration not found. Did you forget to apply a MockMvcRestDocumentationConfigurer when building the MockMvc instance?`
+   - ℹ️ 해결 방법
+   	-  application-properties에서 설정으로 해결
+		  ```properties
+		server:
+		  # 한글 반환 처리
+		  servlet:
+		    encoding:
+		      force-response: true
+		  ```
