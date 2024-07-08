@@ -939,6 +939,42 @@ dependencies {
   }
   ```
 
+### 원하는 Snippets 커스텀 방법
+- 문제
+  - Snippet이 기본으로 제공하는 틀을 사용하면 `PayloadDocumentation.fieldWithPath("name").description("Name fof new Event")` 와 같이 필드명, 설명 만 나오게 된다.
+- 해결 방법
+  - `src/test/resources/org/springframework/restdocs/templates` 경로의 폴더를 만든다
+  - 커스텀을 원하는 `스니팻명.snippet`으로 파일을 만든 후 원하는 형식으로 내용을 채워준다.
+  - 예시
+    - `request-fields` 커스텀
+      ```properties
+      // ℹ️ request-fields.snippet
+      |===
+      |필드명|타입|필수 값 여부|설명
+
+      {{#fields}}
+      |{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
+      |{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+      |{{#tableCellContent}}{{#optional}}false{{/optional}}{{^optional}}true{{/optional}}{{/tableCellContent}}
+      |{{#tableCellContent}}{{description}}{{/tableCellContent}}
+      {{/fields}}
+      |===
+        ```
+    - `query-parameters` 커스텀      
+      ```properties
+      // ℹ️ query-parameters.snippet
+      |===
+      |Parameter|필수 값 여부|설명
+
+      {{#parameters}}
+      |{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
+      |{{#tableCellContent}}{{#optional}}false{{/optional}}{{^optional}}true{{/optional}}{{/tableCellContent}}
+      |{{#tableCellContent}}{{description}}{{/tableCellContent}}
+
+      {{/parameters}}
+      |===
+      ```    
+
 ## AscIIdocs
 
 - 설정 방법
