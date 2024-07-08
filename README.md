@@ -1,8 +1,14 @@
 # restAPIStudy
 
 ## 목차
-- [REST_API 란?](#REST_API 란?)
-- [REST_API 란?](## 개발 시 참고 사항)
+
+- [REST_API 란?](#rest_api-란)
+- [hateoas 란?](#hateoas란)
+
+
+
+
+  
 ### REST_API 란?
 
 - REST 아키텍처 스타일을 따르는 API
