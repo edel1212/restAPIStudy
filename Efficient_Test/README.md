@@ -1,5 +1,10 @@
 # Efficient Test
 
+```properties
+# ℹ️ @RunWith(SpringRunner.class)를 활용한 스토빙 테스트 보단 @SpringBootTest를 활용한 테스트 코드를 작성하자!
+#  ㄴ> 이유 : Spring_Tips를 참고
+```
+
 ## 방법 및 구조 - 일반적인 로직 테스트
 
 - `assertj`를 사용하면 쉽게 테스트가 가능하다.
