@@ -348,3 +348,98 @@
         encoding:
           force-response: true
       ```
+- ### 엄격한 Request 값 제한
+```properties
+# ℹ️ 사용 유무는 권장이 아니며 개발 상황에 맞게 사용한다.
+#  - 좀 더 엄격하게 사용자의 요청값에 제한을 두는 것이다.
+```
+- 흐름
+  - 사용자 : `{name : "yoo",age : 100}` 로 서버로 요청 보냄
+  - 서버 : Class field 값 `private String name`만 존제 
+  - 서버가 허용하지 않는 `age`를 넘기므로 예외를 발생 시킴
+- 설정 방법
+  - properties 설정
+    - `spring.jackson.deserialization.fail-on-unknown-properties=true` 
+
+- ### Request 값 체크
+  - dependencies 
+    - `implementation 'org.springframework.boot:spring-boot-starter-validation'`
+  - DTO Class
+    -  `@NotEmpty`, `@NotNull`, `@Min(0)`, `@Max(0)` 등등 사용하여 검증
+        ```java
+        @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
+        @Builder
+        public class LoginReq {
+            @NotNull
+            private String id;
+            @NotNull
+            private String password;
+        }
+        ```
+  - Controller
+    - Parameter 내 `@Valid` 지정 감시 대상으로 설정
+    - DTO내 검증 기준에 맞지 않으면 `BindingResult` 객채 내 에러를 담고 있음
+        ```java
+        public class MemberController{
+            @PostMapping(value = "/sign-in", consumes = MediaType.APPLICATION_JSON_VALUE)
+            public ResponseEntity<EntityModel<JwtToken>> signIn(@Valid @RequestBody LoginReq loginReq
+                    // ℹ️ 해당 객체에 검증 결과를 담고 있음
+                    , BindingResult bindingResult){
+                // 값 검증
+                if(bindingResult.hasErrors()) throw new InputValidException();
+                // code..
+                return ResponseEntity.ok().body(entityModel);
+            }
+        }
+        ```
+
+- ### Request 값 체크 - 더 정밀한 검증
+  - 검증 처리 Class 생성 
+    ```java
+    @Component // Bean 등록
+    public class EventValidator {
+        /**
+         * ℹ️ 실제 검증을 처리할 Method
+         * - 각각 Parmamter로 ( 검증 대상DTO, 예외를 핸들링할 객체 )
+         * */
+        public void validate(EventDTO eventDTO, BindingResult bindingResult){
+            // 👉 최대 값을 넘는지 체크하는 로직
+            if(eventDTO.getBasePrice() > eventDTO.getMaxPrice()
+                && eventDTO.getMaxPrice() > 0 ){
+                // 👉 rejectValue()를 통해 에러 주입 ( 필드명, 에러코드, 에러 메세지 )
+                bindingResult.rejectValue("basePrice", "wrongValue", "BasePrice is wrong");
+                bindingResult.rejectValue("maxPrice", "wrongValue", "MaxPrice is wrong");
+            }//if
+    
+            // 예외 처리 두번째
+            LocalDateTime eventEndTime =  eventDTO.getEndEventDateTime();
+            if(eventEndTime.isBefore(eventDTO.getBeginEventDateTime())){
+                bindingResult.rejectValue("endEventDateTime", "wrongValue", " endEventDateTime is wrong");
+            }
+    
+            /** 위와 같은 방식으로 차례차례 검증 로직을 늘려 전부 Pass해야 정상 Request로 지정 */
+        }
+    }
+    ```
+  - Controller
+    ```java
+    public class EventController{
+        // 👉 의존성 주입
+        private final EventValidator eventValidator;
+        
+        @PostMapping(value = "/event", consumes = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<EntityModel<JwtToken>> eventTest(@Valid @RequestBody EventDTO eventDTO
+                , BindingResult bindingResult){
+            
+            // 👉 검증 로직으로 확인
+            eventValidator.validate(LoginReq, bindingResult);
+            
+            // 값 검증
+            if(bindingResult.hasErrors()) throw new InputValidException();
+            // code..
+            return ResponseEntity.ok().body(entityModel);
+        }
+    }
+    ```
