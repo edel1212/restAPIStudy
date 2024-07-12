@@ -443,3 +443,109 @@
         }
     }
     ```
+
+- ### 복합키 처리 방법
+  - 복합키 처리 방법에는 `@EmbeddedId`, `@IdClass`가 있으며, 진행하는 프로젝트 스타일에 맞춰 사용하는 것이 중요하다.
+  - 차이
+    - `@EmbeddedId` : 좀 더 객체 지향에 가깝다
+      - Query : `select p.id.id1, p.id.i2 from Parent p`
+    - `@IdClass` : 좀 더 RDBMS에 가깝다
+        - Query : `select p.i1, p.id2 from Parent p`
+  - 사용법
+    - #### `@EmbeddedId`
+      - PK Class
+        - Class에 `@Embeddable` 지정
+        - 기본 생성자 필수
+        - `Serializable` 인터페이스 구현
+        - equals, hashCode 구현(`@EqualsAndHashCode`) - 식별자로 사용하기 위함
+      - Entity Class
+        - 해당 PK 필드 `@EmbeddedId` 적용
+        - 해당 PK Class 자체에서 equals, hashCode 사용중 이므로 `@EqualsAndHashCode` 불필요
+      - 예시 
+        ```java
+        @Embeddable
+        @NoArgsConstructor(access = AccessLevel.PROTECTED)
+        @EqualsAndHashCode
+        @AllArgsConstructor
+        @Getter
+        @Builder
+        public class MemberPK implements Serializable {
+            private String name;
+            private Integer SSID;
+        }
+        
+        ///////////////////////////////////////////////////////
+        
+        @Entity
+        @Getter
+        @AllArgsConstructor
+        @NoArgsConstructor(access = AccessLevel.PROTECTED)
+        @Builder
+        public class Member {
+        
+            @EmbeddedId
+            private MemberPK id;
+        
+            // code ...
+        }
+        ```
+    - #### `@IdClass`
+      - PK Class
+        - 기본 생성자 필수
+        - `Serializable` 인터페이스 구현
+        - equals, hashCode 구현(`@EqualsAndHashCode`) - 식별자로 사용하기 위함
+      - Entity Class
+        - `@IdClass(만들어진 PK클래스.class)` 지정 필요
+        - 각각의 필드를 재정의 하면된다.
+          - `@Id`으로 PK 다중 지정이 가능해짐 
+      - 예시
+        ```java
+        
+        @Entity
+        @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+        @NoArgsConstructor(access = AccessLevel.PROTECTED)
+        @AllArgsConstructor
+        @Builder
+        public class GrandParent {
+            @Id
+            @EqualsAndHashCode.Include
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            private Long grandParentId;
+        
+            private String grandParentName;
+        }
+        
+        ///////////////////////////////////////////////////////
+        
+        @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+        @NoArgsConstructor(access = AccessLevel.PROTECTED)
+        @AllArgsConstructor
+        @Builder
+        public class ParentPK implements Serializable {
+        
+            @EqualsAndHashCode.Include
+            private Long parentId;
+        
+            @EqualsAndHashCode.Include
+            private Long grandParent;
+        
+        }
+        
+        ///////////////////////////////////////////////////////
+        
+        @IdClass(ParentPK.class)
+        @Entity
+        public class Parent {
+            
+            @Id
+            @Column(name= "parent_id")
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            private Long parentId;
+        
+            @Id
+            @ManyToOne
+            @JoinColumn(name = "grand_parent_id")
+            private GrandParent grandParent;
+        
+        }
+        ```
