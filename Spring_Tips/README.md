@@ -549,3 +549,32 @@
         
         }
         ```
+
+- ### Entity 생성자
+  - JPA는 리플렉션을 사용하여 엔티티 인스턴스를 생성할 때 매개변수가 없는 기본 생성자가 필요하다.
+    - 개발자가 명시적으로 기본 생성자를 제공하지 않으면, 컴파일러는 자동으로 생성 한다
+      - 개발자가 명시적으로 기본 생성자를 제공하지 않으면, 컴파일러는 자동으로 생성합니다.
+  - Builder Pattern을 사용할 경우에도 생성자 메서드 명시가 필요하다. 
+  - `@NoArgsConstructor(access = AccessLevel.PROTECTED)`로 접근제어를 하는 이유?
+    - Entity 연관 관계에서 지연 로딩의 경우에는 실제 Entity가 아닌 ⭐️`proxy`객체를 통해서 조회를 한다.
+      - 프록시 객체를 사용하기 위해서 JPA 구현체는, 실제 엔티티의 기본 생성자를 통해 프록시 객체를 생성하는데, 이 때 접근 권한이 `private`이면 **`proxy` 객체를 생성할 수 없기 떄문이다.**
+        - 👉 단! 즉시로딩으로 구현하게 되면, 접근 권한과 상관없이 `proxy`객체가 아닌 실제 `Entity`를 생성하므로 문제가 생기지 않는다 
+  - 사용 예시
+    ```java
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED) // 생성자를 통해서 값 변경 목적으로 접근하는 메시지들 차단
+    @AllArgsConstructor
+    @Builder
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    @Entity
+    public class User {
+        @Id
+        @EqualsAndHashCode.include
+        private String id;
+        private String password;
+    }
+    ```
+       
+
+
+
