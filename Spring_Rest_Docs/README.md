@@ -67,6 +67,8 @@
   }
   ```
 - ### Snippet 생성
+  -  👉 주의사항
+    -   `Reuqest/Response` 모든 필드 값이 `Null or 필수 값X`이라 해도 생성하려는 Snippet에 정의 되어 있어야 한다
   ```java
   @Log4j2
   @AutoConfigureMockMvc
