@@ -157,6 +157,8 @@
 - 해결 방법
   - `src/test/resources/org/springframework/restdocs/templates` 경로의 폴더를 만든다
   - 커스텀을 원하는 `스니팻명.snippet`으로 파일을 만든 후 원하는 형식으로 내용을 채워준다.
+  - 요창하는 데이터 형식에 따라 다르므로 공식 문서를 확인하자
+    - [링크]([https://github.com/edel1212/restAPIStudy/blob/main/src/docs/asciidoc/index.adoc](https://github.com/spring-projects/spring-restdocs/tree/main/spring-restdocs-core/src/main/resources/org/springframework/restdocs/templates/asciidoctor))
   - 예시
     - `request-fields` 커스텀
       ```properties
@@ -186,7 +188,34 @@
       {{/parameters}}
       |===
       ```    
+    - `request-part-fields` 커스텀
+      ```properties
+      // ℹ️ request-part-fields.snippet
+      |===
+      |필드명|타입|필수 값 여부|설명
 
+      {{#fields}}
+      |{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
+      |{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+      |{{#tableCellContent}}{{#optional}}false{{/optional}}{{^optional}}true{{/optional}}{{/tableCellContent}}
+      |{{#tableCellContent}}{{description}}{{/tableCellContent}}
+      {{/fields}}
+      |===
+      ```  
+    - `request-parts` 커스텀
+      ```properties
+      // ℹ️ request-parts.snippet
+      |===
+      |필드명|필수 값 여부|설명
+
+      {{#requestParts }}
+      |{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
+      |{{#tableCellContent}}{{#optional}}false{{/optional}}{{^optional}}true{{/optional}}{{/tableCellContent}}
+      |{{#tableCellContent}}{{description}}{{/tableCellContent}}
+      {{/requestParts}}
+      |===
+      ```  
+  
 ## AscIIdocs
 
 ```properties
