@@ -66,7 +66,7 @@
       }
   }
   ```
-- ### Snippet 생성
+- ### Snippet 생성 (응답/ 요청 -JSON 경우)
   -  👉 주의사항
     -   `Reuqest/Response` 모든 필드 값이 `Null or 필수 값X`이라 해도 생성하려는 Snippet에 정의 되어 있어야 한다
   ```java
@@ -120,6 +120,26 @@
       }
   }    
   ```
+- ### Snippet 생성 (응답 - PathValriable 경우)
+  - ℹ️ `RestDocumentationRequestBuilders`를 사용해서 `get()`요청을 진행해야한다.
+  - uri 내 `{PathValue}`형식으로 값을 지정해줘야한다
+  ```java
+  class TestClss{
+    @DisplayName("@PathVariable 경우")
+    @Test
+    public void getPathVariable() throws Exception{
+      mockMvc.perform(RestDocumentationRequestBuilders.get("/poi-icon/{iconSetId}", poiIconSetRes.getIconSetId())
+                        .header(HttpHeaders.AUTHORIZATION, adminToken))
+                .andDo(print())
+      .andDo(document("스니펫명",
+         // PathVariable 생성
+                    pathParameters(
+                            parameterWithName("iconSetId").description("아이콘셋 ID")
+                    )
+      )
+  }
+  ```
+  
 - ### Snippet 커스텀 - Pretty
   - 필수는 아니고 선택이다.
   - Snippet 내용 자체가 정렬되지 않은 문자열 형태은 것을 커스텀을 통해 수정이 가능하다.
