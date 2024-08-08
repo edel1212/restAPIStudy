@@ -139,6 +139,48 @@
       )
   }
   ```
+- ### Snippet 생성 (응답 - Multupart 경우)
+  - ℹ️ `RestDocumentationRequestBuilders`를 사용해서 `get()`요청을 진행해야한다.
+  - uri 내 `{PathValue}`형식으로 값을 지정해줘야한다
+  ```java
+  class TestClss{
+    @DisplayName("@PathVariable 경우")
+    @Test
+    public void getPathVariable() throws Exception{
+     // Given
+        POIIconSetReq poiIconSetReq = POIIconSetReq.builder().build();
+        MockMultipartFile poiIconSetReqPart = super.makeJSONPart(poiIconSetReq, "poiIconSetReq");
+
+        MockMultipartFile defaultIcon = new MockMultipartFile("defaultIcon", "defaultIcon.png", MediaType.IMAGE_PNG_VALUE, "dummy data".getBytes());
+        MockMultipartFile step1Icon = new MockMultipartFile("step1Icon", "step1Icon.png", MediaType.IMAGE_PNG_VALUE, "dummy data".getBytes());
+        MockMultipartFile step2Icon = new MockMultipartFile("step2Icon", "step2Icon.png", MediaType.IMAGE_PNG_VALUE, "dummy data".getBytes());
+        MockMultipartFile step3Icon = new MockMultipartFile("step3Icon", "step3Icon.png", MediaType.IMAGE_PNG_VALUE, "dummy data".getBytes());
+        MockMultipartFile threeDimensions = new MockMultipartFile("threeDimensions", "threeDimensions.glb", String.valueOf(MediaType.valueOf("model/gltf-binary")), "dummy data".getBytes());
+
+        // When & Then
+        this.mockMvc.perform(multipart("/poi-icon")
+                        .file(poiIconSetReqPart)
+                        .file(defaultIcon)
+                        .file(step1Icon)
+                        .file(step2Icon)
+                        .file(step3Icon)
+                        .file(threeDimensions)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .header(HttpHeaders.AUTHORIZATION, adminToken))
+                .andDo(print())
+                .andDo(document("register-poi-icon-set",
+                        requestParts(
+                                partWithName("poiIconSetReq").description("아이콘 셋의 정보 JSON 데이터"),
+                                partWithName("defaultIcon").description("기본 아이콘 이미지 파일").optional(),
+                                partWithName("step1Icon").description("1단계 아이콘 이미지 파일").optional(),
+                                partWithName("step2Icon").description("2단계 아이콘 이미지 파일").optional(),
+                                partWithName("step3Icon").description("3단계 아이콘 이미지 파일").optional(),
+                                partWithName("threeDimensions").description("3D 모델 파일 (threeDimensions)").optional()
+                        )
+                ))
+        ;
+  }
+  ```
   
 - ### Snippet 커스텀 - Pretty
   - 필수는 아니고 선택이다.
