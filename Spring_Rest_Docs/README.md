@@ -166,9 +166,9 @@
                         .file(step3Icon)
                         .file(threeDimensions)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .header(HttpHeaders.AUTHORIZATION, adminToken))
                 .andDo(print())
                 .andDo(document("register-poi-icon-set",
+                        // ℹ️ 파일 데이터 Part
                         requestParts(
                                 partWithName("poiIconSetReq").description("아이콘 셋의 정보 JSON 데이터"),
                                 partWithName("defaultIcon").description("기본 아이콘 이미지 파일").optional(),
@@ -176,7 +176,16 @@
                                 partWithName("step2Icon").description("2단계 아이콘 이미지 파일").optional(),
                                 partWithName("step3Icon").description("3단계 아이콘 이미지 파일").optional(),
                                 partWithName("threeDimensions").description("3D 모델 파일 (threeDimensions)").optional()
-                        )
+                        ),
+                        // ℹ️ JSON 데이터 Part
+                        requestPartFields("poiIconSetReq",
+                                fieldWithPath("iconSetName").description("아이콘 셋의 이름"),
+                                fieldWithPath("description").description("아이콘 셋의 설명").optional(),
+                                fieldWithPath("step1Color").description("1단계 색상").optional(),
+                                fieldWithPath("step2Color").description("2단계 색상").optional(),
+                                fieldWithPath("step3Color").description("3단계 색상").optional(),
+                                fieldWithPath("iconSetDisplayType").description("아이콘 셋의 표시 유형 [TWO_DIMENSIONS, THREE_DIMENSIONS, ALL]")
+                        ),
                 ))
         ;
   }
