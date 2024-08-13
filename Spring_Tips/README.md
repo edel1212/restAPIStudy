@@ -590,3 +590,64 @@
         - Ex) `Member m1 = r.findById(1); 와 Member m2 = r.findById(1);` 비교 하는 경우에만 영향이 있다 
 
 
+- ### 파일 제공
+    - `Resource` 인터페이스
+        - 로우 레벨 자원들에 접근을 추상화하기 위한 인터페이스이다.
+        - 중요 메서드
+            -  getInputStream() : 자원을 탐색하여 열고 자원을 읽기 위해서 InputStream 타입으로 반환합니다.
+            -  exists() : 접근하고자 하는 자원이 존재하는지 확인합니다.
+            -  isOpen() : 해당 자원에 접근하고 있는 스트림이 있는지 여부를 확인합니다.
+                -  true라면 입력 스트림을 여러번 읽을 수 없으며, 자원 누수를 방 지하기 위해 한번만 읽은 다음 닫아야 합니다.
+            -  getDescription() : 자원을 사용할때 오류 출력에 사용되는 설명을 반환합니다.
+    -  `Resource` 구현물들
+        - UrlResource
+            - `HTTPS, FTP` 등을 대상으로 접근하는데 사용됩니다. 모든 URL들은 **표준화된 문자열 접두어**를 가지고 있습니다.
+            - **접두어에 따른** Resource 인스턴스가 생성됩니다.
+            - URL 경로와 같이 API 메서드 호출시 묵시적으로 UrlResource 인스턴스 생성됨
+                -  파일 경로일 경우 : `file:`  FileSystemResource 인스턴스로 생성
+                -  HTTP일 경우 : `https:`  UrlResource 인스턴스가 생성
+                -  FTP일 경우 : `ftp:`
+        - ClassPathResource
+            - 프로젝트 내부의 파일을 읽어올 경우 사
+            -  쓰레드 컨텍스트 클래스 로더를 사용하거나  자원들을 불러오기 위해 사용
+                - `ClassPathResource resource = new ClassPathResource("data.json");`
+                    - src/main/resoruces/부터 바로 읽을 수 있다.
+        - FileSystemResource
+            -  "java.io.File" 클래스를 다루기 위한 클래스
+        - PathResource
+        - ServletContextResource
+            - 웹 애플리케이션의 루트 디렉토리 내부에서 상대적인 경로를 해석하는 ServletContext 자원들을 위해서 구현된 클래스 
+        - InputStreamResource
+            - 특정 리소스 구현이 적용되지 않는 경우에만 사용해야 합니다. 특히 ByteArrayResource나 파일 기반의 Resource 구현체가 해당됩니다. 
+        - ByteArrayResource
+            - 클래스는 바이트 배열을 래핑하는 클래스
+    -  다운로드 예시 코드
+        ```java
+        public class FileStorageController {
+            private final FileStorageService fileStorageService;
+        
+            @GetMapping("/download/model/{fileId}")
+            public ResponseEntity<Resource> downloadModel(@PathVariable Long fileId) throws IOException {
+                FileStorageDto fileStorageDto   = fileStorageService.getFileInfo(fileId);
+                String contentDisposition ="attachment; filename=" + fileStorageDto.getOriginFileName() + "";
+                String fullFilePath             = fileStorageService.fullFilePath(fileStorageDto);
+                Resource resource               = new FileSystemResource(fullFilePath);
+                String contentType              = Files.probeContentType(resource.getFile().toPath());
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                        .header(HttpHeaders.CONTENT_TYPE, contentType)
+                        .body(resource);
+            }
+        
+            @GetMapping("/icon/{fileId}")
+            public ResponseEntity<Resource> downloadIcon(@PathVariable Long fileId) throws IOException {
+                FileStorageDto fileStorageDto   = fileStorageService.getFileInfo(fileId);
+                String fullFilePath             = fileStorageService.fullFilePath(fileStorageDto);
+                Resource resource               = new FileSystemResource(fullFilePath);
+                String contentType              = Files.probeContentType(resource.getFile().toPath());
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_TYPE, contentType)
+                        .body(resource);
+            }
+        }  
+        ```
