@@ -651,3 +651,35 @@
             }
         }  
         ```
+
+- ### ServletUriComponentsBuilder
+  - `UriComponentsBuilder`를 상속 받은 클래스이다
+  - 이전 요청의 URI를 재사용하여 보다 편리하게 URI를 사용할 수 있도록 한다.
+  - 사용 가능한 메서드
+    ```properties
+    - fromContextPath(HttpServletRequest)
+    - fromServletMapping(HttpServletRequest)
+    - fromRequestUri(HttpServletRequest)
+    - fromRequest(HttpServletRequest)
+    
+    # 👉 하위 메서드들은 요청 객체를 RequestContextHolder로부터 얻는다는 점을 제외하고 위의 메서드들과 동일.
+    - fromCurrentContextPath()
+    - fromCurrentServletMapping()
+    - fromCurrentRequestUri()
+    - fromCurrentRequest()
+    ```
+    -  사용 예시
+        ```java
+        /** 받아온 요청값의 도메인을 사용해서 URL 생성 */
+        public class UserController {
+            @PostMapping("/users")    
+            public ResponseEntity<User> createUser(@RequestBody User user){
+                User savedUser = service.save(user);         
+                URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                        .path("/{id}") 
+                        .buildAndExpand(savedUser.getId())  
+                        .toUri();         
+                return ResponseEntity.created(location).build();    
+            }
+        }
+        ```  
