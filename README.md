@@ -6,8 +6,6 @@
 - [HATEOAS 사용법](https://github.com/edel1212/restAPIStudy/tree/main/HATEOAS)
 - [RstDocs 사용법](https://github.com/edel1212/restAPIStudy/tree/main/Spring_Rest_Docs)
 - [효율적인 테스트 방법](https://github.com/edel1212/restAPIStudy/tree/main/Spring_Tips)
-- [SpringBoot 이용간 유용한 정보](https://github.com/edel1212/restAPIStudy/tree/main/Spring_Tips)
-
   
 ## REST?
 - REST란 `REpresentational State Transfer`의 약자로 웹 기반의 소프트웨어 아키텍처 스타일 중 하나
